@@ -11,7 +11,7 @@ CMessageLoop::~CMessageLoop()
 {}
 
 void CMessageLoop::Run()
-{
+{ 
 	if (m_thread_handle == INVALID_HANDLE_VALUE)
 	{
 		m_event_thread_create = CreateEvent(NULL, TRUE, FALSE, NULL);
@@ -77,11 +77,10 @@ DWORD CMessageLoop::ThreadProc()
 
 BOOL CMessageLoop::post_message(UINT msg, WPARAM wparam, LPARAM lparam)
 {
-	WaitForSingleObject(m_event_thread_create,INFINITE);
 	if (m_event_thread_create != INVALID_HANDLE_VALUE)
 	{
+		WaitForSingleObject(m_event_thread_create, INFINITE);
 		return PostThreadMessage(m_thread_id, msg, wparam, lparam);
 	}
-	else
-		return FALSE;
+	return FALSE;
 }
