@@ -8,7 +8,9 @@ CMessageLoop::CMessageLoop() :m_thread_id(0),
 {}
 
 CMessageLoop::~CMessageLoop()
-{}
+{
+    Stop();
+}
 
 void CMessageLoop::Run()
 { 
