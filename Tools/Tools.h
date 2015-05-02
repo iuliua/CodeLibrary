@@ -4,7 +4,7 @@ public:
     // set current directory to gateway's executable folder location
 	static void SetCurrDirToModuleLocation(LPCWSTR folder=NULL)
 	{
-		MTAPISTR buffer;
+		WCHAR buffer[MAX_PATH];
 		GetModuleFileName(GetModuleHandle(NULL), buffer, _countof(buffer));
 		std::wstring module_name(buffer);
 		module_name = module_name.substr(0, module_name.rfind(L'\\'));
