@@ -1,5 +1,6 @@
 #include <string>
 #include <iphlpapi.h>  
+#include <ShlDisp.h>
 #pragma comment(lib, "IPHLPAPI.lib")
 class Tools
 {
