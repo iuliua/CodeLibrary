@@ -1,10 +1,87 @@
 #include <string>
+#include <iostream>
+#include <fstream>
 #include <iphlpapi.h>  
-#include <ShlDisp.h>
 #pragma comment(lib, "IPHLPAPI.lib")
+#define CURL_STATICLIB
+#include "unzip/unzip.h" 
+#include "curl/curl.h"
 class Tools
 {
 public:
+    struct MemoryStruct {
+        char *memory;
+        size_t size;
+    };
+    static size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp)
+    {
+        size_t realsize = size * nmemb;
+        struct MemoryStruct *mem = (struct MemoryStruct *)userp;
+
+        mem->memory = (char*)realloc(mem->memory, mem->size + realsize + 1);
+        if (mem->memory == NULL) {
+            /* out of memory! */
+            printf("not enough memory (realloc returned NULL)\n");
+            return 0;
+        }
+
+        memcpy(&(mem->memory[mem->size]), contents, realsize);
+        mem->size += realsize;
+        mem->memory[mem->size] = 0;
+
+        return realsize;
+    }
+    static bool DownloadLink(std::wstring &link,MemoryStruct& chunk)
+    {
+        CURL *curl_handle;
+        CURLcode res;
+
+        chunk.memory = (char*)malloc(1);  /* will be grown as needed by the realloc above */
+        chunk.size = 0;    /* no data at this point */
+
+        curl_global_init(CURL_GLOBAL_ALL);
+        /* init the curl session */
+        curl_handle = curl_easy_init();
+        /* specify URL to get */
+        curl_easy_setopt(curl_handle, CURLOPT_URL, Tools::WStringToString(link).c_str());
+        /* send all data to this function  */
+        curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, &Tools::WriteMemoryCallback);
+
+        /* we pass our 'chunk' struct to the callback function */
+        curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, (void *)&chunk);
+
+        /* some servers don't like requests that are made without a user-agent
+        field, so we provide one */
+        curl_easy_setopt(curl_handle, CURLOPT_USERAGENT, "libcurl-agent/1.0");
+
+        /* get it! */
+        res = curl_easy_perform(curl_handle); 
+        /* check for errors */
+        if (res != CURLE_OK) {
+            //MessageBox(Tools::StringToWString(curl_easy_strerror(res)).c_str());
+        }
+        else {
+            /*
+            * Now, our chunk.memory points to a memory block that is chunk.size
+            * bytes big and contains the remote file.
+            *
+            * Do something nice with it!
+            */
+
+            //printf("%lu bytes retrieved\n", (long)chunk.size);
+        }
+        long http_code = 0;
+        curl_easy_getinfo(curl_handle, CURLINFO_RESPONSE_CODE, &http_code);
+
+        /* cleanup curl stuff */
+        curl_easy_cleanup(curl_handle);
+
+        //free(chunk.memory);
+
+        /* we're done with libcurl, so clean it up */
+        curl_global_cleanup();
+        return (res==CURLE_OK && http_code==200);
+    }
     // set current directory to gateway's executable folder location
 	static void SetCurrDirToModuleLocation(LPCWSTR folder=NULL)
 	{
@@ -69,110 +146,46 @@ public:
     {
         return DoubleEqual(d1, 0);
     }
-    static bool Unzip2Folder(BSTR lpZipFile, BSTR lpFolder)
+    static bool UnzipFileType(std::wstring lpZipFile,std::wstring out_folder,std::wstring file_type)
     {
-        IShellDispatch *pISD;
-
-        Folder  *pZippedFile = 0L;
-        Folder  *pDestination = 0L;
-
-        long FilesCount = 0;
-        IDispatch* pItem = 0L;
-        FolderItems *pFilesInside = 0L;
-
-        VARIANT Options, OutFolder, InZipFile, Item;
-        CoInitialize(NULL);
-        __try{
-            if (CoCreateInstance(CLSID_Shell, NULL, CLSCTX_INPROC_SERVER, IID_IShellDispatch, (void **)&pISD) != S_OK)
-                return 1;
-
-            InZipFile.vt = VT_BSTR;
-            InZipFile.bstrVal = lpZipFile;
-            pISD->NameSpace(InZipFile, &pZippedFile);
-            if (!pZippedFile)
+        HZIP hz = OpenZip(lpZipFile.c_str(), 0);
+        ZIPENTRY ze; GetZipItem(hz, -1, &ze); int numitems = ze.index;
+        ZRESULT zr=ZR_FAILED;
+        for (int i = 0; i < numitems; i++)
             {
-                pISD->Release();
-                return 1;
+            GetZipItem(hz, i, &ze);
+            if (std::wstring(ze.name).substr(std::wstring(ze.name).rfind(L'.') + 1).compare(file_type) == 0)
+            {
+                char* buffer = new char[ze.unc_size];
+                zr=UnzipItem(hz, i, buffer, ze.unc_size);
+                std::ofstream out_file(out_folder+L"\\"+ze.name, std::ios::binary);
+                out_file.write(buffer, ze.unc_size);
+                out_file.close();
             }
-
-            OutFolder.vt = VT_BSTR;
-            OutFolder.bstrVal = lpFolder;
-            GetFileAttributes(lpFolder);
-
-            DWORD attrib = GetFileAttributes(lpFolder);
-            if (attrib == INVALID_FILE_ATTRIBUTES)
-                CreateDirectory(lpFolder, NULL);
-
-
-            pISD->NameSpace(OutFolder, &pDestination);
-            if (!pDestination)
-            {
-                pZippedFile->Release();
-                pISD->Release();
-                return 1;
             }
-
-            pZippedFile->Items(&pFilesInside);
-            if (!pFilesInside)
-            {
-                pDestination->Release();
-                pZippedFile->Release();
-                pISD->Release();
-                return 1;
+        CloseZip(hz);
+        return (zr==ZR_OK);
             }
-
-            pFilesInside->get_Count(&FilesCount);
-            if (FilesCount < 1)
+    static bool UnzipFileType(char* buffer, size_t buffer_size,std::wstring file_type, MemoryStruct &out)
             {
-                pFilesInside->Release();
-                pDestination->Release();
-                pZippedFile->Release();
-                pISD->Release();
-                return 0;
-            }
-
-
-            FolderItem* folder_item = 0L;
-            bool retval;
-            for (int i = 0; i < FilesCount; i++)
-            {
-                BSTR name;
-                BSTR ext;
-                ext = ::SysAllocString(L"ext");
-                Item.vt = VT_I4;
-                Item.intVal = i;
-                pFilesInside->Item(Item, &folder_item);
-                folder_item->get_Path(&name);
-                size_t length = wcslen(name);
-                wcscpy_s(ext, 4, name + length - 3);
-                if (wcscmp(ext, L"xml") == 0)
+        HZIP hz = OpenZip(buffer,(UINT)buffer_size, 0);
+        ZIPENTRY ze; GetZipItem(hz, -1, &ze); int numitems = ze.index;
+        ZRESULT zr=ZR_FAILED;
+        for (int i = 0; i < numitems; i++)
                 {
-                    folder_item->QueryInterface(IID_IDispatch, (void**)&pItem);
-                    Item.vt = VT_DISPATCH;
-                    Item.pdispVal = pItem;
-
-                    Options.vt = VT_I4;
-                    Options.lVal = 1024 | 512 | 16 | 4;//http://msdn.microsoft.com/en-us/library/bb787866(VS.85).aspx
-
-                    retval = pDestination->CopyHere(Item, Options) == S_OK;
-                }
-                folder_item->Release(); folder_item = 0;
-                ::SysFreeString(ext);
-            }
-
-            pItem->Release(); pItem = 0L;
-            pFilesInside->Release(); pFilesInside = 0L;
-            pDestination->Release(); pDestination = 0L;
-            pZippedFile->Release(); pZippedFile = 0L;
-            pISD->Release(); pISD = 0L;
-
-            return retval;
-
-        }
-        __finally
+            GetZipItem(hz, i, &ze);
+            if (std::wstring(ze.name).substr(std::wstring(ze.name).rfind(L'.') + 1).compare(file_type) == 0)
         {
-            CoUninitialize();
+                out.memory = new char[ze.unc_size];
+                out.size = ze.unc_size;
+                zr = UnzipItem(hz, i, out.memory, (UINT)out.size);
+                //std::ofstream out(out_folder + L"\\" + ze.name, std::ios::binary);
+                //out.write(buffer, ze.unc_size);
+                //out.close();
+            }
         }
+        CloseZip(hz);
+        return  (zr == ZR_OK);
     }
     static void CalculatePrevDay(SYSTEMTIME st, LPSYSTEMTIME out)
     {
