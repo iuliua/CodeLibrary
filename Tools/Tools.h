@@ -187,9 +187,8 @@ public:
         CloseZip(hz);
         return  (zr == ZR_OK);
     }
-    static void CalculatePrevDay(SYSTEMTIME st, LPSYSTEMTIME out)
+    static void CalculatePrevDay(SYSTEMTIME &st)
     {
-        *out = { 0 };
         int maxday[13] = { 0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
         if ((st.wYear & 3) == 0 && ((st.wYear % 25) != 0 || (st.wYear & 15) == 0))
@@ -199,22 +198,22 @@ public:
         {
             if (st.wMonth == 1)
             {
-                out->wYear = st.wYear - 1;
-                out->wMonth = 12;
-                out->wDay = maxday[12];
+                st.wYear = st.wYear - 1;
+                st.wMonth = 12;
+                st.wDay = maxday[12];
             }
             else
             {
-                out->wYear = st.wYear;
-                out->wMonth = st.wMonth - 1;
-                out->wDay = maxday[out->wMonth];
+                st.wYear = st.wYear;
+                st.wMonth = st.wMonth - 1;
+                st.wDay = maxday[st.wMonth];
             }
         }
         else
         {
-            out->wYear = st.wYear;
-            out->wMonth = st.wMonth;
-            out->wDay = st.wDay - 1;
+            st.wYear = st.wYear;
+            st.wMonth = st.wMonth;
+            st.wDay = st.wDay - 1;
         }
     }
     static unsigned short getVolumeHash()
