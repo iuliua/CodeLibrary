@@ -4,12 +4,17 @@
 
 CMessageLoop::CMessageLoop() :m_thread_id(0), 
                               m_thread_handle(INVALID_HANDLE_VALUE), 
-							  m_event_thread_create(INVALID_HANDLE_VALUE)
+							  m_event_thread_create(INVALID_HANDLE_VALUE),
+                              m_timer(NULL)
 {}
 
 CMessageLoop::~CMessageLoop()
 {
+    m_processors.clear();
+    CloseHandle(m_event_thread_create);
+    DeleteTimerQueueTimer(NULL,m_timer,NULL);
     Stop();
+    WaitToFinish();
 }
 
 void CMessageLoop::Run()
@@ -23,7 +28,7 @@ void CMessageLoop::Run()
 
 void CMessageLoop::Stop()
 {
-	post_message(MSG_QUIT, 0, 0);
+    this->msg(MSG_QUIT);
 }
 
 bool CMessageLoop::isRunning()
@@ -46,7 +51,6 @@ void CMessageLoop::WaitToFinish()
 		CloseHandle(m_thread_handle);
 		m_thread_handle = INVALID_HANDLE_VALUE;
 		m_thread_id = 0;
-		CloseHandle(m_event_thread_create);
 	}
 }
 
@@ -70,14 +74,19 @@ DWORD CMessageLoop::ThreadProc()
 			PostQuitMessage(0);
 			break;
 		default:
-			ProcessMessage(msg);
-			break;
+            {
+                BOOL res = true;
+                for (auto it : m_processors)
+                {
+                    res = res&&it->ProcessMessage(msg);
+                } 
+            }
 		}
 	}
 	return 0;
 }
 
-BOOL CMessageLoop::post_message(UINT msg, WPARAM wparam, LPARAM lparam)
+BOOL CMessageLoop::msg(UINT msg, WPARAM wparam, LPARAM lparam)
 {
 	if (m_event_thread_create != INVALID_HANDLE_VALUE)
 	{
@@ -85,4 +94,28 @@ BOOL CMessageLoop::post_message(UINT msg, WPARAM wparam, LPARAM lparam)
 		return PostThreadMessage(m_thread_id, msg, wparam, lparam);
 	}
 	return FALSE;
+}
+
+
+BOOL CMessageLoop::add_timer(DWORD due_time, DWORD period,UINT msg_type)
+{
+    if (m_timer == NULL)
+    {
+        data.loop = this;
+        data.msg_type = msg_type;
+        data.onetimetimer = (period == 0) ? TRUE : FALSE;
+        return CreateTimerQueueTimer(&m_timer, NULL, (WAITORTIMERCALLBACK)MsgLoop_TimerExpired, &data, due_time, period, 0);
+    }
+    else
+        return FALSE;
+}
+VOID CALLBACK CMessageLoop::MsgLoop_TimerExpired(PVOID param, BOOL flag)
+{
+    TimerStruct &data = *((TimerStruct*)param);
+    data.loop->msg(data.msg_type);
+    if (data.onetimetimer)
+    {
+        data.loop->m_timer = NULL;
+        data.onetimetimer = FALSE;
+    }
 }
