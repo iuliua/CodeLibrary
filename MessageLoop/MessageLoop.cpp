@@ -4,15 +4,13 @@
 
 CMessageLoop::CMessageLoop() :m_thread_id(0), 
                               m_thread_handle(INVALID_HANDLE_VALUE), 
-							  m_event_thread_create(INVALID_HANDLE_VALUE),
-                              m_timer(NULL)
+							  m_event_thread_create(INVALID_HANDLE_VALUE)
 {}
 
 CMessageLoop::~CMessageLoop()
 {
     m_processors.clear();
     CloseHandle(m_event_thread_create);
-    DeleteTimerQueueTimer(NULL,m_timer,NULL);
     Stop();
     WaitToFinish();
 }
@@ -94,28 +92,4 @@ BOOL CMessageLoop::msg(UINT msg, WPARAM wparam, LPARAM lparam)
 		return PostThreadMessage(m_thread_id, msg, wparam, lparam);
 	}
 	return FALSE;
-}
-
-
-BOOL CMessageLoop::add_timer(DWORD due_time, DWORD period,UINT msg_type)
-{
-    if (m_timer == NULL)
-    {
-        data.loop = this;
-        data.msg_type = msg_type;
-        data.onetimetimer = (period == 0) ? TRUE : FALSE;
-        return CreateTimerQueueTimer(&m_timer, NULL, (WAITORTIMERCALLBACK)MsgLoop_TimerExpired, &data, due_time, period, 0);
-    }
-    else
-        return FALSE;
-}
-VOID CALLBACK CMessageLoop::MsgLoop_TimerExpired(PVOID param, BOOL flag)
-{
-    TimerStruct &data = *((TimerStruct*)param);
-    data.loop->msg(data.msg_type);
-    if (data.onetimetimer)
-    {
-        data.loop->m_timer = NULL;
-        data.onetimetimer = FALSE;
-    }
 }
