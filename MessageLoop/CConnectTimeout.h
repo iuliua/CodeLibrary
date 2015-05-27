@@ -44,8 +44,8 @@ public:
         TimerStruct *data=TimerStruct::Allocate();
         if (data && msg_listener)
         {
-        data->m_msg_listener = msg_listener;
-        data->m_msg = msg;
+            data->m_msg_listener = msg_listener;
+            data->m_msg = msg;
             if (CreateTimerQueueTimer(&hTimer, NULL, (WAITORTIMERCALLBACK)TimerExpiredWrapper, (PVOID)data, timeout * 1000, 0, 0))
                 m_memory_by_timer[hTimer] = data;
         }
