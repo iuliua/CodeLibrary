@@ -1,6 +1,4 @@
-#include "stdafx.h"
 #include "MessageLoop.h"
-
 
 CMessageLoop::CMessageLoop() :m_thread_id(0), 
                               m_thread_handle(INVALID_HANDLE_VALUE), 

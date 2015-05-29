@@ -1,8 +1,3 @@
-//+------------------------------------------------------------------+
-//|                                       MetaTrader 5 TFEX Gateway  |
-//|                       Copyright 2001-2015, MetaTrader Solutions  |
-//|                              http://www.metatradersolutions.com  |
-//+------------------------------------------------------------------+
 #pragma once
 class ITimeoutProvider
 {

@@ -1,5 +1,6 @@
 #pragma once
-
+#include <windows.h>
+#include <vector>
 class IMessageListener
 {
 public:
@@ -28,7 +29,6 @@ private:
 	HANDLE m_event_thread_create;
     std::vector<IMessageProcessor*> m_processors;
 
-    static VOID CALLBACK MsgLoop_TimerExpired(PVOID param, BOOL flag);
 	static DWORD WINAPI ThreadProcWrapper(LPVOID);
 	virtual DWORD ThreadProc();
 
