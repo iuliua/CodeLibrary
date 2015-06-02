@@ -1,8 +1,13 @@
 #pragma once
+class ITimeoutHandler
+{
+public:
+    virtual void timeout(UINT)=0;
+};
 class ITimeoutProvider
 {
 public:
-    virtual HANDLE add(IMessageListener* msg_listener,UINT timeout, UINT message) = 0;
+    virtual HANDLE add(ITimeoutHandler* msg_listener, UINT timeout, UINT message) = 0;
     virtual void remove(HANDLE handle_timer)=0;
 };
 class CConnectTimeout:public ITimeoutProvider
@@ -12,7 +17,7 @@ private:
     std::map<HANDLE, PVOID> m_memory_by_timer;
     struct TimerStruct :public CMemoryPoolObject < TimerStruct >
     {
-        IMessageListener* m_msg_listener;
+        ITimeoutHandler* m_msg_listener;
         UINT m_msg;
     };
 
@@ -20,7 +25,7 @@ private:
     static VOID CALLBACK TimerExpiredWrapper(PVOID param, BOOL flag)
     {
         TimerStruct &data = *((TimerStruct*)param);
-        data.m_msg_listener->msg(data.m_msg);
+        data.m_msg_listener->timeout(data.m_msg);
         TimerStruct::Free(param);
     }
 
@@ -33,7 +38,7 @@ public:
             TimerStruct::Free(m_memory_by_timer[hTimer]);
         }
     }
-    HANDLE add(IMessageListener* msg_listener,UINT timeout, UINT msg) override
+    HANDLE add(ITimeoutHandler* msg_listener, UINT timeout, UINT msg) override
     {
         HANDLE hTimer=NULL;
         TimerStruct *data=TimerStruct::Allocate();

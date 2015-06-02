@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 #include <iphlpapi.h>  
 #pragma comment(lib, "IPHLPAPI.lib")
 namespace Tools
@@ -6,19 +7,21 @@ namespace Tools
     static unsigned short getVolumeHash()
     {
         DWORD serialNum = 0;
-
         // Determine if this volume uses an NTFS file system.      
         GetVolumeInformation(L"c:\\", NULL, 0, &serialNum, NULL, NULL, NULL, 0);
         unsigned short  hash = (unsigned short)((serialNum + (serialNum >> 16)) & 0xFFFF);
-
         return hash;
     }
-    static const char* getMachineName()
+    static unsigned short getMachineNameHash()
     {
-        static char computerName[1024];
+        char computerName[1024];
         DWORD size = 1024;
+        computerName[0] = 0;
         GetComputerNameA(computerName, &size);
-        return &(computerName[0]);
+        unsigned short hash = 0;
+        for (unsigned i = 0; i < strlen(computerName); i++)
+            hash += computerName[i];
+        return hash;
     }
     static unsigned short getCpuHash()
     {
@@ -43,6 +46,7 @@ namespace Tools
 
     static void getMacHash(unsigned short& mac1, unsigned short& mac2)
     {
+        mac1 = 0; mac2 = 0;
         IP_ADAPTER_INFO AdapterInfo[32];
         DWORD dwBufLen = sizeof(AdapterInfo);
 
@@ -68,8 +72,8 @@ namespace Tools
     {
         unsigned short mac1, mac2;
         getMacHash(mac1, mac2);
-        char buffer[13];
-        sprintf_s(buffer, 13, "%x%x%x", getVolumeHash(), getCpuHash(), mac1);
+        char buffer[64];
+        sprintf_s(buffer, 64, "%04x%04x%04x%04x", getVolumeHash(), getCpuHash(), mac1==0?mac2:mac1,getMachineNameHash());
         return buffer;
     }
 };
