@@ -19,6 +19,7 @@ void CMessageLoop::Run()
 	{
 		m_event_thread_create = CreateEvent(NULL, TRUE, FALSE, NULL);
 		m_thread_handle=CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)ThreadProcWrapper, this, 0, &m_thread_id);
+        OnStart();
 	}
 }
 
@@ -76,6 +77,7 @@ DWORD CMessageLoop::ThreadProc()
                 {
                     res = res&&it->ProcessMessage(msg);
                 } 
+                MessageCleanup(msg);
             }
 		}
 	}

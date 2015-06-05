@@ -4,13 +4,8 @@ class ITimeoutHandler
 public:
     virtual void timeout(UINT)=0;
 };
-class ITimeoutProvider
-{
-public:
-    virtual HANDLE add(ITimeoutHandler* msg_listener, UINT timeout, UINT message) = 0;
-    virtual void remove(HANDLE handle_timer)=0;
-};
-class CConnectTimeout:public ITimeoutProvider
+
+class CTimer
 {
 
 private:
@@ -30,7 +25,7 @@ private:
     }
 
 public:
-    void remove(HANDLE hTimer) override
+    void remove(HANDLE hTimer) 
     {
         if (hTimer)
         {
@@ -38,7 +33,7 @@ public:
             TimerStruct::Free(m_memory_by_timer[hTimer]);
         }
     }
-    HANDLE add(ITimeoutHandler* msg_listener, UINT timeout, UINT msg) override
+    HANDLE add(ITimeoutHandler* msg_listener, UINT timeout, UINT msg)
     {
         HANDLE hTimer=NULL;
         TimerStruct *data=TimerStruct::Allocate();

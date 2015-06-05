@@ -31,6 +31,7 @@ private:
 
 	static DWORD WINAPI ThreadProcWrapper(LPVOID);
 	virtual DWORD ThreadProc();
+    virtual void MessageCleanup(MSG &msg){};
 
 public:
 	CMessageLoop();
@@ -40,6 +41,7 @@ public:
 	bool isRunning();
 	void WaitToFinish();
 	virtual BOOL msg(UINT msg, WPARAM wparam = 0, LPARAM lparam = 0) override;
+    virtual void OnStart(){};
     void add_processor(IMessageProcessor* proc)
     {
         m_processors.push_back(proc);
