@@ -33,7 +33,7 @@ public:
             TimerStruct::Free(m_memory_by_timer[hTimer]);
         }
     }
-    HANDLE add(ITimeoutHandler* msg_listener, UINT timeout, UINT msg)
+    HANDLE add(ITimeoutHandler* msg_listener, UINT timeout, UINT msg=0)
     {
         HANDLE hTimer=NULL;
         TimerStruct *data=TimerStruct::Allocate();
