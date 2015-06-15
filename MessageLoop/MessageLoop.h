@@ -1,6 +1,8 @@
 #pragma once
 #include <windows.h>
 #include <vector>
+#include <iostream>
+#include <fstream>
 class IMessageProcessor
 {
 public:
@@ -33,6 +35,18 @@ private:
 	static DWORD WINAPI ThreadProcWrapper(LPVOID);
 	virtual DWORD ThreadProc();
     virtual void MessageCleanup(MSG &msg){};
+protected:
+    virtual std::string message_text(UINT msg1)
+    {  
+        switch (msg1)
+        {
+        case MSG_QUIT:
+            return "MSG_QUIT";
+        case MSG_ADD_PROCESSOR:
+            return "MSG_ADD_PROCESSOR";
+        }
+        return "";
+    };
 
 public:
 	CMessageLoop();

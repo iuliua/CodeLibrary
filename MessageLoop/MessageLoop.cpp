@@ -65,6 +65,8 @@ DWORD CMessageLoop::ThreadProc()
 	MSG msg;
 	while (GetMessage(&msg, 0, 0, 0))
 	{
+        //std::ofstream out("messages.txt",std::ios::binary | std::ios::app);
+        //out << message_text(msg.message).c_str()<< std::endl;
 		switch (msg.message)
 		{
 		case MSG_QUIT:
