@@ -13,11 +13,10 @@ class IMessageListener
 public:
     virtual ~IMessageListener(){};
     virtual BOOL msg(UINT, WPARAM = 0, LPARAM = 0) = 0;
-    virtual void add_processor(IMessageProcessor* proc) = 0;
+    virtual BOOL add_processor(IMessageProcessor* proc) = 0;
 };
 
-class CMessageLoop:public IMessageListener,
-                   public IMessageProcessor
+class CMessageLoop:public IMessageListener
 {
 public:
     enum{
@@ -57,9 +56,9 @@ public:
 	void WaitToFinish();
 	virtual BOOL msg(UINT msg, WPARAM wparam = 0, LPARAM lparam = 0) override;
     virtual void OnStart(){};
-    virtual void add_processor(IMessageProcessor* proc) override
+    virtual BOOL add_processor(IMessageProcessor* proc) override
     {
-        msg(MSG_ADD_PROCESSOR, (WPARAM)(proc));
+        return msg(MSG_ADD_PROCESSOR, (WPARAM)(proc));
     }
 };
 
