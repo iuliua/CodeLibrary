@@ -2,7 +2,8 @@
 
 CMessageLoop::CMessageLoop() :m_thread_id(0), 
                               m_thread_handle(INVALID_HANDLE_VALUE), 
-							  m_event_thread_create(INVALID_HANDLE_VALUE)
+							  m_event_thread_create(INVALID_HANDLE_VALUE),
+                              m_time_to_stop(0)
 {}
 
 CMessageLoop::~CMessageLoop()
@@ -81,7 +82,7 @@ DWORD CMessageLoop::ThreadProc()
                 BOOL res = true;
                 for (auto it : m_processors)
                 {
-                    res = res&&it->ProcessMessage(msg);
+                    res = res&&it->ProcessMessage(msg,InterlockedAdd(&m_time_to_stop,0));
                 } 
                 MessageCleanup(msg);
             }

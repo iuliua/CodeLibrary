@@ -6,7 +6,7 @@
 class IMessageProcessor
 {
 public:
-    virtual BOOL ProcessMessage(MSG &) = 0;
+    virtual BOOL ProcessMessage(MSG &,BOOL) = 0;
 };
 class IMessageListener
 {
@@ -46,10 +46,12 @@ protected:
         }
         return "";
     };
-
+private:
+    volatile long m_time_to_stop;
 public:
 	CMessageLoop();
 	~CMessageLoop();
+    void PrepareToStop() { InterlockedExchange(&m_time_to_stop, 1); }
 	void Run();
 	void Stop();
 	bool isRunning();

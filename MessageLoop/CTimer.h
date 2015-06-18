@@ -1,4 +1,6 @@
 #pragma once
+#include <map>
+#include "CMemoryPoolObject.h"
 class ITimeoutHandler
 {
 public:
