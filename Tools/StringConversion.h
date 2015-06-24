@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 namespace Tools
 {
     static const std::wstring StringToWString(const std::string& s)
