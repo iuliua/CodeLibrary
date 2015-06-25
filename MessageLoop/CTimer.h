@@ -1,6 +1,5 @@
 #pragma once
 #include <map>
-#include "CMemoryPoolObject.h"
 class ITimeoutHandler
 {
 public:
@@ -12,8 +11,9 @@ class CTimer
 
 private:
     std::map<HANDLE, PVOID> m_memory_by_timer;
-    struct TimerStruct :public CMemoryPoolObject < TimerStruct >
+    struct TimerStruct
     {
+        TimerStruct(ITimeoutHandler* t, UINT m) :m_msg_listener(t), m_msg(m){};
         ITimeoutHandler* m_msg_listener;
         UINT m_msg;
     };
@@ -23,7 +23,7 @@ private:
     {
         TimerStruct &data = *((TimerStruct*)param);
         data.m_msg_listener->timeout(data.m_msg);
-        TimerStruct::Free(param);
+        delete (TimerStruct*)param;
     }
 
 public:
@@ -32,20 +32,23 @@ public:
         if (hTimer)
         {
             DeleteTimerQueueTimer(NULL, hTimer, INVALID_HANDLE_VALUE);
-            TimerStruct::Free(m_memory_by_timer[hTimer]);
+            delete (TimerStruct*)(m_memory_by_timer[hTimer]);
         }
     }
     HANDLE add(ITimeoutHandler* msg_listener, UINT timeout, UINT msg=0)
     {
-        HANDLE hTimer=NULL;
-        TimerStruct *data=TimerStruct::Allocate();
-        if (data && msg_listener)
+        if (msg_listener)
         {
-            data->m_msg_listener = msg_listener;
-            data->m_msg = msg;
-            if (CreateTimerQueueTimer(&hTimer, NULL, (WAITORTIMERCALLBACK)TimerExpiredWrapper, (PVOID)data, timeout * 1000, 0, 0))
-                m_memory_by_timer[hTimer] = data;
+            HANDLE hTimer = NULL;
+            TimerStruct *data = new (std::nothrow)TimerStruct(msg_listener, msg);
+            if (data)
+            {
+                if (CreateTimerQueueTimer(&hTimer, NULL, (WAITORTIMERCALLBACK)TimerExpiredWrapper, (PVOID)data, timeout * 1000, 0, 0))
+                    m_memory_by_timer[hTimer] = data;
+            }
+            return hTimer;
         }
-        return hTimer;
+        else
+            return INVALID_HANDLE_VALUE;
     }
 };
