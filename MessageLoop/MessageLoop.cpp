@@ -82,21 +82,21 @@ DWORD CMessageLoop::ThreadProc()
                 BOOL res = true;
                 for (auto it : m_processors)
                 {
-                    res = res&&it->ProcessMessage(msg,InterlockedAdd(&m_time_to_stop,0));
+                    res = res&&it->ProcessMessage(msg.message,(LPVOID)msg.wParam,InterlockedAdd(&m_time_to_stop,0));
                 } 
-                MessageCleanup(msg);
+                MessageCleanup((LPVOID)msg.wParam);
             }
 		}
 	}
 	return 0;
 }
 
-BOOL CMessageLoop::msg(UINT msg, WPARAM wparam, LPARAM lparam)
+BOOL CMessageLoop::msg(UINT msg, LPVOID wparam, LPARAM lparam)
 {
 	if (m_event_thread_create != INVALID_HANDLE_VALUE)
 	{
 		WaitForSingleObject(m_event_thread_create, INFINITE);
-		return PostThreadMessage(m_thread_id, msg, wparam, lparam);
+		return PostThreadMessage(m_thread_id, msg,(WPARAM)wparam, lparam);
 	}
 	return FALSE;
 }
