@@ -82,7 +82,7 @@ DWORD CMessageLoop::ThreadProc()
                 {
                     res = res&&it->ProcessMessage(msg.message,(LPVOID)msg.wParam,InterlockedAdd(&m_time_to_stop,0));
                 } 
-                MessageCleanup((LPVOID)msg.wParam);
+                MessageCleanup((LPVOID)msg.wParam,msg.lParam);
             }
 		}
 	}

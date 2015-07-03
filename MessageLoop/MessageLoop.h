@@ -12,7 +12,7 @@ class IMessageListener
 {
 public:
     virtual ~IMessageListener(){};
-    virtual BOOL msg(UINT, LPVOID= 0, LPARAM = 0) = 0;
+    virtual BOOL msg(UINT, LPVOID= 0, LPARAM=0) = 0;
     virtual BOOL add_processor(IMessageProcessor* proc) = 0;
 };
 
@@ -34,7 +34,7 @@ protected:
 
 	static DWORD WINAPI ThreadProcWrapper(LPVOID);
 	virtual DWORD ThreadProc();
-    virtual void MessageCleanup(LPVOID){};
+    virtual void MessageCleanup(LPVOID,LPARAM){};
 protected:
     virtual std::string message_text(UINT msg1)
     {  
