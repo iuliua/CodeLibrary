@@ -51,6 +51,7 @@ public:
 	CMessageLoop();
 	~CMessageLoop();
     void PrepareToStop() { InterlockedExchange(&m_time_to_stop, 1); }
+    void RevertPrepareToStop() { InterlockedExchange(&m_time_to_stop, 0); }
 	void Run();
 	void Stop();
 	bool isRunning();
