@@ -17,4 +17,15 @@ namespace Tools
     {
         return DoubleEqual(d1, 0.0);
     }
+    inline static bool DoubleGreater(double d1, double d2)
+    {
+        if ((d1 - d2) > DBL_EPSILON)
+            return true;
+        else
+            return false;
+    }
+    inline static bool DoubleGreaterOrEqual(double d1, double d2)
+    {
+        return (DoubleGreater(d1, d2) || DoubleEqual(d1, d2));
+    }
 };

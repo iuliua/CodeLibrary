@@ -5,20 +5,68 @@ namespace Tools
     class CStateMachine
     {
     public:
-        CStateMachine() :m_current_state(-1){};
+        CStateMachine() :m_current_state(-1)
+            , hThread(INVALID_HANDLE_VALUE)
+        {
+            DWORD thread_id;
+            hThread=CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)ThreadProcWrapper, this, 0, &thread_id);
+        };
+
         virtual void doAction(int id) = 0;
         void event(int event)
         {
-            for (auto &transition : m_transitions)
-            {
-                if (transition.current != m_current_state || transition.event != event)
-                    continue;
-                m_current_state = transition.next;
-                doAction(transition.action);
-                break;
+            m_sync.Lock();
+            qDataQueue.push(event);
+            m_sync.Unlock();
+            
+        }
+        bool event_available()
+        {
+            m_sync.Lock();
+            UINT size=qDataQueue.size();
+            m_sync.Unlock();
+            return size > 0;
+        }
+        ~CStateMachine()
+        {
+            CloseHandle(hThread);
+        }
+    private:
+        std::queue<int> qDataQueue;
+        CriticalSection m_sync;
+        HANDLE hThread;
+    protected:
+
+        static DWORD ThreadProcWrapper(LPVOID arg)
+        {
+            ((CStateMachine*)arg)->ThreadProc();
+            return 0;
+        }
+        void ThreadProc()
+        {
+            while (true)
+            { 
+                m_sync.Lock();
+                if (qDataQueue.size())
+                {
+                    int event = qDataQueue.front();
+                    qDataQueue.pop();
+                    m_sync.Unlock();
+                    for (auto &transition : m_transitions)
+                    {
+                        if (transition.current != m_current_state || transition.event != event)
+                            continue; 
+                        m_current_state = transition.next;
+                        doAction(transition.action);
+                        break;
+                    }
+                }
+                else
+                {
+                    m_sync.Unlock(); 
+                }
             }
         }
-    protected:
         struct Transition
         {
             int current;

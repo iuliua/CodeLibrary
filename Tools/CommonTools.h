@@ -13,13 +13,14 @@ namespace Tools
     static void SetCurrDirToModuleLocation(LPCWSTR folder = NULL)
     {
         WCHAR buffer[MAX_PATH];
-        GetModuleFileName(GetModuleHandle(NULL), buffer, _countof(buffer));
+        GetModuleFileNameW(GetModuleHandle(NULL), buffer, _countof(buffer));
         std::wstring module_name(buffer);
         module_name = module_name.substr(0, module_name.rfind(L'\\'));
         if (folder)
             module_name = module_name + L"\\" + std::wstring(folder);
-        SetCurrentDirectory(module_name.c_str());
+        SetCurrentDirectoryW(module_name.c_str());
     }
+    // counts digits for number of form 0.0001
     static UINT GetNumberOfDigits(double number)
     {
         char buf[32];
