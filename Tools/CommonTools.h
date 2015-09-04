@@ -10,10 +10,10 @@ namespace Tools
         size_t size;
     };
     // set current directory to gateway's executable folder location
-    static void SetCurrDirToModuleLocation(LPCWSTR folder = NULL)
+    static void SetCurrDirToModuleLocation(HANDLE module,LPCWSTR folder = NULL)
     {
         WCHAR buffer[MAX_PATH];
-        GetModuleFileNameW(GetModuleHandle(NULL), buffer, _countof(buffer));
+        GetModuleFileNameW((HMODULE)module, buffer, _countof(buffer));
         std::wstring module_name(buffer);
         module_name = module_name.substr(0, module_name.rfind(L'\\'));
         if (folder)

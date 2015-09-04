@@ -32,7 +32,7 @@ private:
 public:
     CMatching(){};
     ~CMatching(){};
-    void Load(const std::string &pattern, bool demo_mode)
+    void Load(const std::string &pattern, bool demo_mode=false)
     {
         std::string          item;
         std::istringstream   ss(pattern);
