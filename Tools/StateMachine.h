@@ -64,6 +64,7 @@ namespace Tools
                 else
                 {
                     m_sync.Unlock(); 
+                    Sleep(100);
                 }
             }
         }
