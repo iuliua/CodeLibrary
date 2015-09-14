@@ -16,4 +16,9 @@ namespace Tools
             dst[0] = 0;
         return dst;
     }
+    static std::string ToString(INT64 number)
+    {
+        char buffer[64];
+        return _i64toa(number, buffer, 10);
+    }
 };
