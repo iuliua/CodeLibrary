@@ -34,7 +34,7 @@ protected:
 
 	static DWORD WINAPI ThreadProcWrapper(LPVOID);
 	virtual DWORD ThreadProc();
-    virtual void MessageCleanup(LPVOID,LPARAM){};
+    virtual void MessageCleanup(UINT,LPVOID,LPARAM){};
 protected:
     virtual std::string message_text(UINT msg1)
     {  
