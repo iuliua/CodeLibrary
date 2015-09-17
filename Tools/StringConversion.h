@@ -19,6 +19,7 @@ namespace Tools
     static std::string ToString(INT64 number)
     {
         char buffer[64];
-        return _i64toa(number, buffer, 10);
+        _i64toa_s(number, buffer,64,10);
+        return buffer;
     }
 };
