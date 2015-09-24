@@ -3,7 +3,7 @@
 class ITimeoutHandler
 {
 public:
-    virtual void timeout(UINT)=0;
+    virtual void timeout(std::string)=0;
 };
 class CMeasureTime
 {
@@ -33,9 +33,9 @@ private:
     std::map<HANDLE, PVOID> m_memory_by_timer;
     struct TimerStruct
     {
-        TimerStruct(ITimeoutHandler* t, UINT m) :m_msg_listener(t), m_msg(m){};
+        TimerStruct(ITimeoutHandler* t, std::string m) :m_msg_listener(t), m_msg(m){};
         ITimeoutHandler* m_msg_listener;
-        UINT m_msg;
+        std::string m_msg;
     };
 
 private:
@@ -55,7 +55,7 @@ public:
             delete (TimerStruct*)(m_memory_by_timer[hTimer]);
         }
     }
-    HANDLE add(ITimeoutHandler* msg_listener, UINT timeout, UINT msg=0)
+    HANDLE add(ITimeoutHandler* msg_listener, UINT timeout, std::string msg="")
     {
         if (msg_listener)
         {
