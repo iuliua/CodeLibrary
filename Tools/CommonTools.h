@@ -78,4 +78,25 @@ namespace Tools
             st.wDay = st.wDay - 1;
         }
     }
+    class CMeasureTime
+    {
+        LARGE_INTEGER start1, finish, freq;
+        double last_meas;
+    public:
+        CMeasureTime() { QueryPerformanceFrequency(&freq); }
+        void start()
+        {
+            QueryPerformanceCounter(&start1);
+        }
+        void stop()
+        {
+            QueryPerformanceCounter(&finish);
+            last_meas = (finish.QuadPart - start1.QuadPart) / (double)freq.QuadPart;
+        }
+        inline double get()
+        {
+            return last_meas;
+        }
+
+    };
 }
