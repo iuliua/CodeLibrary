@@ -14,6 +14,8 @@ public:
     virtual ~IMessageListener(){};
     virtual BOOL msg(UINT, LPVOID= 0, LPARAM=0) = 0;
     virtual BOOL add_processor(IMessageProcessor* proc) = 0;
+    virtual void set_exiting() = 0;
+    virtual void reset_exiting() = 0;
 };
 
 class CMessageLoop:public IMessageListener
@@ -25,39 +27,25 @@ public:
         MSG_START
     };
 
-protected:
+private:
 	DWORD m_thread_id;
-    volatile long m_time_to_stop;
+    volatile long m_exiting;
 	HANDLE m_thread_handle;
 	HANDLE m_event_thread_create;
     std::vector<IMessageProcessor*> m_processors;
-
 	static DWORD WINAPI ThreadProcWrapper(LPVOID);
-	virtual DWORD ThreadProc();
+	DWORD ThreadProc();
     virtual void MessageCleanup(UINT,LPVOID,LPARAM){};
-protected:
-    virtual std::string message_text(UINT msg1)
-    {  
-        switch (msg1)
-        {
-        case MSG_QUIT:
-            return "MSG_QUIT";
-        case MSG_ADD_PROCESSOR:
-            return "MSG_ADD_PROCESSOR";
-        }
-        return "";
-    };
+    inline BOOL get_exiting() { return InterlockedAdd(&m_exiting, 0); }
+
 public:
 	CMessageLoop();
 	~CMessageLoop();
-    void PrepareToStop() { InterlockedExchange(&m_time_to_stop, 1); }
-    void RevertPrepareToStop() { InterlockedExchange(&m_time_to_stop, 0); }
-	void Run();
+    void set_exiting() { InterlockedExchange(&m_exiting, 1);}
+    void reset_exiting() { InterlockedExchange(&m_exiting, 0); }
 	void Stop();
-	bool isRunning();
 	void WaitToFinish();
 	virtual BOOL msg(UINT msg, LPVOID wparam = 0, LPARAM lparam = 0) override;
-    virtual void OnStart(){};
     virtual BOOL add_processor(IMessageProcessor* proc) override
     {
         return msg(MSG_ADD_PROCESSOR, proc);

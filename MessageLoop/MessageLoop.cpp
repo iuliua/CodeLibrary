@@ -3,8 +3,11 @@
 CMessageLoop::CMessageLoop() :m_thread_id(0), 
                               m_thread_handle(INVALID_HANDLE_VALUE), 
 							  m_event_thread_create(INVALID_HANDLE_VALUE),
-                              m_time_to_stop(0)
-{}
+                              m_exiting(0)
+{
+    m_event_thread_create = CreateEvent(NULL, TRUE, FALSE, NULL);
+    m_thread_handle = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)ThreadProcWrapper, this, 0, &m_thread_id);
+}
 
 CMessageLoop::~CMessageLoop()
 {
@@ -15,31 +18,9 @@ CMessageLoop::~CMessageLoop()
     m_processors.clear();
 }
 
-void CMessageLoop::Run()
-{ 
-	if (m_thread_handle == INVALID_HANDLE_VALUE)
-	{
-		m_event_thread_create = CreateEvent(NULL, TRUE, FALSE, NULL);
-		m_thread_handle=CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)ThreadProcWrapper, this, 0, &m_thread_id);
-        OnStart();
-	}
-}
-
 void CMessageLoop::Stop()
 {
     this->msg(MSG_QUIT);
-}
-
-bool CMessageLoop::isRunning()
-{
-	if (m_thread_handle != INVALID_HANDLE_VALUE)
-	{
-		DWORD exit_code = 0;
-		BOOL ret = GetExitCodeThread(m_thread_handle, &exit_code);
-		return (exit_code == STILL_ACTIVE);
-	}
-	else
-		return false;
 }
 
 void CMessageLoop::WaitToFinish()
@@ -64,6 +45,8 @@ DWORD CMessageLoop::ThreadProcWrapper(LPVOID arg)
 
 DWORD CMessageLoop::ThreadProc()
 {
+    SetEvent(this->m_event_thread_create);
+    Sleep(1000);
 	MSG msg;
 	while (GetMessage(&msg, 0, 0, 0))
 	{
@@ -77,11 +60,9 @@ DWORD CMessageLoop::ThreadProc()
             break;
 		default:
             {
-                BOOL res = true;
-                for (auto it : m_processors)
-                {
-                    res = res&&it->ProcessMessage(msg.message,(LPVOID)msg.wParam,InterlockedAdd(&m_time_to_stop,0));
-                } 
+                for (auto &consumer : m_processors)
+                    if (!consumer->ProcessMessage(msg.message, (LPVOID)msg.wParam, get_exiting()))
+                        break;
                 MessageCleanup(msg.message,(LPVOID)msg.wParam,msg.lParam);
             }
 		}
