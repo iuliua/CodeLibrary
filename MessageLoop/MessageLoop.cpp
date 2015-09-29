@@ -11,9 +11,9 @@ CMessageLoop::CMessageLoop() :m_thread_id(0),
 
 CMessageLoop::~CMessageLoop()
 {
+    Stop();
     CloseHandle(m_event_thread_create);
     m_event_thread_create = INVALID_HANDLE_VALUE;
-    Stop();
     WaitToFinish();
     m_processors.clear();
 }
