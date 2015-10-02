@@ -26,9 +26,16 @@ public:
         MSG_ADD_PROCESSOR,
         MSG_START
     };
+    class IMessageCustom
+    {
+    public:
+        virtual void before_msg(UINT msg, LPVOID &wparam, LPARAM &lparam) = 0;
+        virtual void clear_msg(UINT msg, LPVOID wparam, LPARAM lparam) = 0;
+    };
 
 private:
 	DWORD m_thread_id;
+    IMessageCustom* m_custom;
     volatile long m_exiting;
 	HANDLE m_thread_handle;
 	HANDLE m_event_thread_create;
@@ -39,7 +46,8 @@ private:
     inline BOOL get_exiting() { return InterlockedAdd(&m_exiting, 0); }
 
 public:
-	CMessageLoop();
+    operator IMessageListener*(){ return this; }
+    CMessageLoop(IMessageCustom* custom);
 	~CMessageLoop();
     void set_exiting() { InterlockedExchange(&m_exiting, 1);}
     void reset_exiting() { InterlockedExchange(&m_exiting, 0); }

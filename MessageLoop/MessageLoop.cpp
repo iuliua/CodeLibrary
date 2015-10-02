@@ -1,9 +1,10 @@
 #include "MessageLoop.h"
 
-CMessageLoop::CMessageLoop() :m_thread_id(0), 
+CMessageLoop::CMessageLoop(IMessageCustom* custom) :m_thread_id(0), 
                               m_thread_handle(INVALID_HANDLE_VALUE), 
 							  m_event_thread_create(INVALID_HANDLE_VALUE),
-                              m_exiting(0)
+                              m_exiting(0),
+                              m_custom(custom)
 {
     m_event_thread_create = CreateEvent(NULL, TRUE, FALSE, NULL);
     m_thread_handle = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)ThreadProcWrapper, this, 0, &m_thread_id);
@@ -63,7 +64,7 @@ DWORD CMessageLoop::ThreadProc()
                 for (auto &consumer : m_processors)
                     if (!consumer->ProcessMessage(msg.message, (LPVOID)msg.wParam, get_exiting()))
                         break;
-                MessageCleanup(msg.message,(LPVOID)msg.wParam,msg.lParam);
+                m_custom->clear_msg(msg.message, (LPVOID)msg.wParam, msg.lParam);
             }
 		}
 	}
@@ -72,6 +73,7 @@ DWORD CMessageLoop::ThreadProc()
 
 BOOL CMessageLoop::msg(UINT msg, LPVOID wparam, LPARAM lparam)
 {
+    m_custom->before_msg(msg, wparam, lparam);
 	if (m_event_thread_create != INVALID_HANDLE_VALUE)
 	{
 		WaitForSingleObject(m_event_thread_create, INFINITE);
