@@ -48,7 +48,11 @@ namespace Tools
         }
         return 0;
     }
-
+    static std::string ToString(int number)
+    {
+        char buffer[64];
+        return _itoa(number, buffer, 10);
+    }
     static void CalculatePrevDay(SYSTEMTIME &st)
     {
         int maxday[13] = { 0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };

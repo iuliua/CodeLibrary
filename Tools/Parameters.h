@@ -4,13 +4,19 @@
 #include <fstream>
 namespace Tools
 {
-class CParameters
+    class IParams
+    {
+    public:
+        virtual std::string get(const std::string&) = 0;
+    };
+class CParameters:public IParams
 {
 private:
     std::map<std::string, std::string> m_parameters;
     std::vector<std::string> m_names;
     std::string m_config_file;
 public:
+    operator IParams*() { return this; }
     CParameters() {}
     int total() { return m_parameters.size(); }
     int set(const char* name, const char*value)
@@ -34,7 +40,7 @@ public:
         else
             return false;
     }
-    std::string &get(std::string param_name)
+    virtual std::string get(const std::string &param_name) override
     { 
         return m_parameters[param_name]; 
     }
