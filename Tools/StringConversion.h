@@ -22,4 +22,10 @@ namespace Tools
         _i64toa_s(number, buffer,64,10);
         return buffer;
     }
+    static std::wstring ToWString(INT64 number)
+    {
+        wchar_t buffer[64];
+        _i64tow_s(number, buffer,64,10);
+        return buffer;
+    }
 };
