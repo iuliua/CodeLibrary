@@ -56,9 +56,6 @@ DWORD CMessageLoop::ThreadProc()
 		case MSG_QUIT:
 			PostQuitMessage(0);
 			break;
-        case MSG_ADD_PROCESSOR:
-            m_processors.push_back((IMessageProcessor*)(msg.wParam));
-            break;
 		default:
             {
                 for (auto &consumer : m_processors)
