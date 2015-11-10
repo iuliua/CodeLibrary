@@ -7,6 +7,7 @@ class IMessageProcessor
 {
 public:
     virtual BOOL ProcessMessage(UINT,LPVOID,BOOL) = 0;
+    operator IMessageProcessor*(){ return this; }
 };
 class IMessageListener
 {
@@ -16,6 +17,7 @@ public:
     virtual void add_processor(IMessageProcessor* proc) = 0;
     virtual void set_exiting() = 0;
     virtual void reset_exiting() = 0;
+    operator IMessageListener*(){ return this; }
 };
 
 class CMessageLoop:public IMessageListener
@@ -30,6 +32,7 @@ public:
     public:
         virtual void before_msg(UINT msg, LPVOID &wparam, LPARAM &lparam) = 0;
         virtual void clear_msg(UINT msg, LPVOID wparam, LPARAM lparam) = 0;
+        operator CMessageLoop::IMessageCustom*() { return this; }
     };
 
 private:
@@ -44,8 +47,8 @@ private:
     inline BOOL get_exiting() { return InterlockedAdd(&m_exiting, 0); }
 
 public:
-    operator IMessageListener*(){ return this; }
     CMessageLoop(IMessageCustom* custom);
+    ~CMessageLoop();
     void set_exiting() { InterlockedExchange(&m_exiting, 1);}
     void reset_exiting() { InterlockedExchange(&m_exiting, 0); }
 	void Stop();
