@@ -9,7 +9,7 @@ namespace Tools
         char *memory;
         size_t size;
     };
-    // set current directory to gateway's executable folder location
+    // set current directory to modules' location 
     static void SetCurrDirToModuleLocation(HANDLE module,LPCWSTR folder = NULL)
     {
         WCHAR buffer[MAX_PATH];
@@ -20,6 +20,13 @@ namespace Tools
             module_name = module_name + L"\\" + std::wstring(folder);
         SetCurrentDirectoryW(module_name.c_str());
     }
+	// set current directory to files' location 
+	static void SetCurrDirToFileLocation(LPCWSTR file)
+	{
+		std::wstring file_path(file);
+		file_path = file_path.substr(0, file_path.rfind(L'\\'));
+		SetCurrentDirectoryW(file_path.c_str());
+	}
     // counts digits for number of form 0.0001
     static UINT GetNumberOfDigits(double number)
     {
@@ -51,7 +58,10 @@ namespace Tools
     static std::string ToString(int number)
     {
         char buffer[64];
-        return _itoa(number, buffer, 10);
+		if (_itoa_s(number, buffer, _countof(buffer), 10) == 0)
+			return buffer;
+		else
+			return std::string();
     }
     static void CalculatePrevDay(SYSTEMTIME &st)
     {
