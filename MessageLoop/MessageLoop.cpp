@@ -61,7 +61,8 @@ DWORD CMessageLoop::ThreadProc()
                 for (auto &consumer : m_processors)
                     if (!consumer->ProcessMessage(msg.message, (LPVOID)msg.wParam, get_exiting()))
                         break;
-                m_custom->clear_msg(msg.message, (LPVOID)msg.wParam, msg.lParam);
+                if (m_custom)
+                    m_custom->clear_msg(msg.message, (LPVOID)msg.wParam, msg.lParam);
             }
 		}
 	}
@@ -70,7 +71,8 @@ DWORD CMessageLoop::ThreadProc()
 
 BOOL CMessageLoop::msg(UINT msg, LPVOID wparam, LPARAM lparam)
 {
-    m_custom->before_msg(msg, wparam, lparam);
+    if (m_custom)
+        m_custom->before_msg(msg, wparam, lparam);
 	if (m_event_thread_create != INVALID_HANDLE_VALUE)
 	{
 		WaitForSingleObject(m_event_thread_create, INFINITE);
