@@ -1,7 +1,7 @@
 #pragma once
 #include "CommonTools.h"
 #include "StringConversion.h"
-#include "unzip/unzip.h" 
+#include "zip/unzip.h" 
 namespace Tools
 {
     static bool UnzipFileType(std::wstring lpZipFile, std::wstring out_folder, std::wstring file_type)
@@ -19,6 +19,7 @@ namespace Tools
                 std::ofstream out_file(out_folder + L"\\" + ze.name, std::ios::binary);
                 out_file.write(buffer, ze.unc_size);
                 out_file.close();
+                delete[] buffer;
             }
         }
         CloseZip(hz);
