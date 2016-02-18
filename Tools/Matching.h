@@ -10,6 +10,7 @@ private:
     std::vector<std::string> m_pattern_list;
     bool MatchExact(const std::string &pattern, const std::string &input)
     {
+        if (pattern.size() > 0)
         if (pattern.compare("*") == 0 || pattern.compare(input) == 0)
             return true;
         return false;
@@ -17,6 +18,7 @@ private:
 
     bool MatchWild(const std::string &pattern, const std::string &input)
     {
+        if (pattern.size() > 0)
         if (pattern[pattern.size() - 1] == '*')
         {
             if (pattern.size() == 1)
@@ -29,6 +31,7 @@ private:
     }
     bool MatchNegative(const std::string &pattern, const std::string &input)
     {
+        if (pattern.size() > 0)
         if (pattern[0] == '!')
         {
             std::string pattern_negative = pattern.substr(1);
