@@ -8,6 +8,11 @@ public:
         :m_trial_end_date(trial_end_date),
         m_is_full_version(false)
     {
+        if (trial_end_date.size() == 0)
+        {
+            m_is_full_version = true;
+            return;
+        }
         // trial end date MUST be in format DD-MM-YYYY
         struct tm time_struct = { 0 };
         sscanf_s(trial_end_date.c_str(), "%2d-%2d-%4d", &time_struct.tm_mday, &time_struct.tm_mon, &time_struct.tm_year);
