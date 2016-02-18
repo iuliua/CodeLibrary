@@ -32,23 +32,13 @@ private:
 public:
     CMatching(){};
     ~CMatching(){};
-    void Load(const std::string &pattern, bool demo_mode=false)
+    void Load(const std::string &pattern)
     {
         std::string          item;
         std::istringstream   ss(pattern);
         m_pattern_list.clear();
         while (std::getline(ss, item, ','))
-        {
-            if (demo_mode)
-            {
-                // demo mode accepts only 2 symbols 
-                if (item[item.size() - 1] == L'*')
-                    continue;
-                if (m_pattern_list.size() == 2)
-                    break;
-            }
             m_pattern_list.push_back(item);
-        }
     }
 
     bool Match(const std::string &input)
