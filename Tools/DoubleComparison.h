@@ -1,4 +1,5 @@
 #pragma once
+#include "float.h"
 namespace Tools
 {
     inline static bool DoubleEqual(double d1, double d2)
