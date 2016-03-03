@@ -62,5 +62,5 @@ public:
         m_sync.Unlock();
     }
 };
-CLogger  ExtLogger;
+extern CLogger  ExtLogger;
 //+------------------------------------------------------------------+

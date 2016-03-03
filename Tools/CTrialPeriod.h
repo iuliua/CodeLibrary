@@ -1,3 +1,4 @@
+#include <string>
 class CTrialPeriod
 {
     time_t      m_trial_time;
