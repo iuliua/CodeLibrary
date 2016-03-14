@@ -3,13 +3,11 @@
 #include <string>
 #include <sstream>
 #ifdef _DEBUG
-#pragma comment(lib,"libcurld-ssl.lib")
+#pragma comment(lib,"libcurld.lib")
 #else
-#pragma comment(lib,"libcurl-ssl.lib")
+#pragma comment(lib,"libcurl.lib")
 #endif
 #pragma comment(lib,"ws2_32.lib")
-#pragma comment(lib,"ssleay32.lib")
-#pragma comment(lib,"libeay32.lib")
 #pragma comment(lib,"wldap32.lib")
 
 class CSendMail
@@ -56,8 +54,11 @@ public:
             server_url = "smtp://";
         server_url += server;
         curl_easy_setopt(curl, CURLOPT_URL, server_url.c_str());
-        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
-        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
+        if (secure)
+        {
+            curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
+            curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
+        }
         curl_easy_setopt(curl, CURLOPT_MAIL_FROM, from);
         recipients = curl_slist_append(recipients, to);
         curl_easy_setopt(curl, CURLOPT_MAIL_RCPT, recipients);
