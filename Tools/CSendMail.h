@@ -2,13 +2,6 @@
 #include "curl/curl.h"
 #include <string>
 #include <sstream>
-#ifdef _DEBUG
-#pragma comment(lib,"libcurld.lib")
-#else
-#pragma comment(lib,"libcurl.lib")
-#endif
-#pragma comment(lib,"ws2_32.lib")
-#pragma comment(lib,"wldap32.lib")
 
 class CSendMail
 {
