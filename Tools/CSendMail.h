@@ -1,4 +1,3 @@
-#define CURL_STATICLIB
 #include "curl/curl.h"
 #include <string>
 #include <sstream>
@@ -30,7 +29,7 @@ class CSendMail
         }
     }
 public:
-    static CURLcode SendMail(const char* server, BOOL secure, const char* user, const char *passwd, const char* from, const char* sender_name, const char* to, const char * subject, const char* body)
+    static CURLcode SendMail(const char* server, const char* user, const char *passwd, const char* from, const char* sender_name, const char* to,const char* bcc, const char * subject, const char* body)
     {
         CURLcode res = CURLE_OK;
         struct curl_slist *recipients = NULL;
@@ -40,36 +39,27 @@ public:
             return CURLE_FAILED_INIT;
         curl_easy_setopt(curl, CURLOPT_USERNAME, user);
         curl_easy_setopt(curl, CURLOPT_PASSWORD, passwd);
-        std::string server_url;
-        if (secure)
-            server_url = "smtps://";
-        else
-            server_url = "smtp://";
+        std::string server_url = "smtp://";
         server_url += server;
         curl_easy_setopt(curl, CURLOPT_URL, server_url.c_str());
-        if (secure)
-        {
-            curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
-            curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
-        }
         curl_easy_setopt(curl, CURLOPT_MAIL_FROM, from);
         recipients = curl_slist_append(recipients, to);
+        recipients = curl_slist_append(recipients, bcc);
         curl_easy_setopt(curl, CURLOPT_MAIL_RCPT, recipients);
         curl_easy_setopt(curl, CURLOPT_READFUNCTION, payload_source);
         curl_easy_setopt(curl, CURLOPT_READDATA, &upload_ctx);
         curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);
         curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
 
-        std::ostringstream oss;
-        oss << "To: " << to << std::endl;
-        oss << "From: " << from << "(" << sender_name << ")" << std::endl;
-        oss << "Subject: " << subject << std::endl;
-        oss << std::endl;
-        oss << body << std::endl;
-        char buffer[5 * 1024];
-        strcpy_s(buffer, _countof(buffer), oss.str().c_str());
+        char buffer[5*1024];
+        sprintf_s(buffer, _countof(buffer),
+            "To: <%s> \r\n"
+            "From: <%s>(%s) \r\n"
+            "Subject: %s \r\n"
+            "\r\n"
+            "%s", to, from, sender_name, subject, body);
         upload_ctx.buffer = buffer;
-        upload_ctx.len = oss.str().size() + 1;
+        upload_ctx.len = strlen(buffer);
         upload_ctx.read = 0;
 
         res = curl_easy_perform(curl);

@@ -11,8 +11,8 @@
 //     MT4    // 
 ////////////////
 #ifdef ServerApiVersion   
-   #define OWNER_HASH 1765005115 
-   #define TRIAL_END_DATE ""           // "Only for test"
+//   #define OWNER_HASH 1765005115 
+//   #define TRIAL_END_DATE ""           // "Only for test"
 
 // #define OWNER_HASH 3267069397 
 // #define TRIAL_END_DATE "31-03-2016" // "GC Group Limited"
@@ -29,8 +29,8 @@
 // #define OWNER_HASH 3538253584
 // #define TRIAL_END_DATE "16-03-2016" // "Fullerton Markets Limited"
 
-// #define OWNER_HASH 1191163956
-// #define TRIAL_END_DATE ""           // "UOB Kay Hian Private Limited"
+ #define OWNER_HASH 1191163956
+ #define TRIAL_END_DATE ""           // "UOB Kay Hian Private Limited"
 
 // #define OWNER_HASH 1532620363
 // #define TRIAL_END_DATE ""           // "Golden Bullion (Hong Kong) Company Limited"
