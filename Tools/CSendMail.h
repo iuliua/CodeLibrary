@@ -44,7 +44,8 @@ public:
         curl_easy_setopt(curl, CURLOPT_URL, server_url.c_str());
         curl_easy_setopt(curl, CURLOPT_MAIL_FROM, from);
         recipients = curl_slist_append(recipients, to);
-        recipients = curl_slist_append(recipients, bcc);
+        if (strlen(bcc) > 0)
+            recipients = curl_slist_append(recipients, bcc);
         curl_easy_setopt(curl, CURLOPT_MAIL_RCPT, recipients);
         curl_easy_setopt(curl, CURLOPT_READFUNCTION, payload_source);
         curl_easy_setopt(curl, CURLOPT_READDATA, &upload_ctx);
