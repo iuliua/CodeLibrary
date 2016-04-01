@@ -4,7 +4,7 @@ class CLogger
     const char *m_plugin_name;
     CServerInterface *m_server_api;
 public:
-    CLogger(const char *plugin_name) :m_plugin_name(plugin_name)
+    CLogger(const char *plugin_name) :m_plugin_name(plugin_name), m_server_api(NULL)
     {}
     void CLogger::SetAPI(CServerInterface *api)
     {
@@ -13,7 +13,7 @@ public:
 
    void Out(const int code, LPCSTR msg, ...)
     {
-        if (msg)
+        if (m_server_api && msg)
         {
             char buffer[1024];
             va_list ptr;
