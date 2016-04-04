@@ -34,4 +34,13 @@
 
 // #define OWNER_HASH 1532620363
 // #define TRIAL_END_DATE ""           // "Golden Bullion (Hong Kong) Company Limited"
+
+// #define OWNER_HASH 1027648337
+// #define TRIAL_END_DATE ""           // "Evolution iTrade Finance Group Limited"
+
+// #define OWNER_HASH 3785648753
+// #define TRIAL_END_DATE ""           // "Boisil Group Limited"
+
+// #define OWNER_HASH 1625696139
+// #define TRIAL_END_DATE ""           // "TransMarket Group Ltd"
 #endif
