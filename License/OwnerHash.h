@@ -17,6 +17,9 @@
 // #define OWNER_HASH 3267069397 
 // #define TRIAL_END_DATE "31-03-2016" // "GC Group Limited"
 
+// #define OWNER_HASH 2380660658 
+// #define TRIAL_END_DATE "25-04-2016" // "Bethle Aster Global Investments Limited"
+
 // #define OWNER_HASH 1447832137 
 // #define TRIAL_END_DATE "03-03-2016" // "Vantage FX Pty Ltd."
 

@@ -21,11 +21,19 @@ namespace Tools
         std::string m_config_file;
 
     public:
-        CParameters(const char* config_file_name)
+        CParameters()
         {
-            m_config_file = std::string(config_file_name) + ".cfg";
         }
 
+        void SetFileName(HANDLE hModule)
+        {
+            CHAR buffer[MAX_PATH];
+            GetModuleFileName((HMODULE)hModule, buffer, _countof(buffer));
+            std::string module_name(buffer);
+            std::string dest;
+            dest.assign(module_name.begin() + module_name.rfind('\\') + 1, module_name.begin() + module_name.rfind('.'));
+            m_config_file = dest + ".cfg";
+        }
         int total() { return m_parameters.size(); }
 
         operator IParams*() { return this; }
