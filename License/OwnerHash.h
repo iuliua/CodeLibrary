@@ -2,9 +2,14 @@
 //     MT5    // 
 ////////////////
 #ifdef MTServerAPIVersion
-   #define OWNER_HASH 2583523366 // "TestOnlyAu"
-// #define OWNER_HASH 3988937529 // "AppleWealth"
-// #define OWNER_HASH 808574437  // "KimEng"
+   #define OWNER_HASH 2583523366 
+   #define TRIAL_END_DATE ""           // "TestOnlyAu"
+
+// #define OWNER_HASH 3988937529 
+// #define TRIAL_END_DATE "13-04-2016" // "AppleWealth" 
+
+// #define OWNER_HASH 808574437  
+// #define TRIAL_END_DATE "13-04-2016" // "KimEng" 
 #endif
 
 ////////////////
