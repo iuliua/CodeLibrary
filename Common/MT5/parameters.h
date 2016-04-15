@@ -4,7 +4,14 @@
 #include "Tools/Matching.h"
 #include "Tools/StringConversion.h"
 
-class CParameters
+class IParams
+{
+public:
+    virtual std::string get(const std::string&) = 0;
+    virtual void Initialize(IMTServerAPI *api) = 0;
+};
+
+class CParameters:public IParams
 {
 public:
     typedef std::vector < std::pair < std::string, std::string>> ParamList;
@@ -20,7 +27,7 @@ public:
     }
 
 public:
-    std::string ParamValue(const std::string &param_name)
+    std::string get(const std::string &param_name)
     {
         return m_param_values[param_name];
     }
