@@ -38,7 +38,7 @@
 // #define TRIAL_END_DATE "16-03-2016" // "Fullerton Markets Limited"
 
 // #define OWNER_HASH 1191163956
-// #define TRIAL_END_DATE ""           // "UOB Kay Hian Private Limited"
+// #define TRIAL_END_DATE "02-05-2016" // "UOB Kay Hian Private Limited"
 
 // #define OWNER_HASH 1532620363
 // #define TRIAL_END_DATE ""           // "Golden Bullion (Hong Kong) Company Limited"
