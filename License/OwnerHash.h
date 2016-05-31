@@ -1,7 +1,7 @@
 #ifdef MTServerAPIVersion
                                         // "TestOnlyAu"
-  #define TRIAL_END_DATE 0,0,0
-   #define OWNER_HASH 2583523366
+ #define TRIAL_END_DATE 0,0,0
+ #define OWNER_HASH 2583523366
                                         // "AppleWealth" 
 // #define TRIAL_END_DATE 2016,4,13
 // #define OWNER_HASH 3988937529
@@ -9,7 +9,7 @@
 // #define TRIAL_END_DATE 2016,4,13
 // #define OWNER_HASH 808574437
                                         // "VantageFX" 
-// #define TRIAL_END_DATE 2016,6,9
+// #define TRIAL_END_DATE 2016,6,14
 // #define OWNER_HASH 405379118
 
 #endif
