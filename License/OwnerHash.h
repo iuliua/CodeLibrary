@@ -29,7 +29,7 @@
 // #define TRIAL_END_DATE 2016,6,8
 // #define OWNER_HASH 1447832137
                                         // "Forpro Group Pty Ltd"
-// #define TRIAL_END_DATE 2016,6,1
+// #define TRIAL_END_DATE 2016,6,15
 // #define OWNER_HASH 1807536020
                                         // "Vantage Global Prime Pty Ltd"
 // #define TRIAL_END_DATE 2016,3,3
@@ -38,7 +38,7 @@
 // #define TRIAL_END_DATE 2016,3,16
 // #define OWNER_HASH 3538253584
                                         // "UOB Kay Hian Private Limited"
-// #define TRIAL_END_DATE 2016,6,17
+// #define TRIAL_END_DATE 0,0,0
 // #define OWNER_HASH 1191163956
                                         // "Golden Bullion (Hong Kong) Company Limited"
 // #define TRIAL_END_DATE 0,0,0
