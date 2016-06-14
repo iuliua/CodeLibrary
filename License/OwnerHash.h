@@ -26,7 +26,7 @@
 // #define TRIAL_END_DATE 2016,5,10
 // #define OWNER_HASH 2380660658
                                         // "Vantage FX Pty Ltd."
-// #define TRIAL_END_DATE 2016,6,8
+// #define TRIAL_END_DATE 2016,6,28
 // #define OWNER_HASH 1447832137
                                         // "Forpro Group Pty Ltd"
 // #define TRIAL_END_DATE 2016,6,15
