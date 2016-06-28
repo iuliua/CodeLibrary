@@ -1,7 +1,7 @@
 #ifdef MTServerAPIVersion
                                         // "TestOnlyAu"
- #define TRIAL_END_DATE 0,0,0
- #define OWNER_HASH 2583523366
+   #define TRIAL_END_DATE 0,0,0
+   #define OWNER_HASH 2583523366
                                         // "AppleWealth" 
 // #define TRIAL_END_DATE 2016,4,13
 // #define OWNER_HASH 3988937529
@@ -9,7 +9,7 @@
 // #define TRIAL_END_DATE 2016,4,13
 // #define OWNER_HASH 808574437
                                         // "VantageFX" 
-// #define TRIAL_END_DATE 2016,6,14
+// #define TRIAL_END_DATE 2016,7,12
 // #define OWNER_HASH 405379118
 
 #endif
@@ -26,10 +26,10 @@
 // #define TRIAL_END_DATE 2016,5,10
 // #define OWNER_HASH 2380660658
                                         // "Vantage FX Pty Ltd."
-// #define TRIAL_END_DATE 2016,6,28
+// #define TRIAL_END_DATE 2016,7,12
 // #define OWNER_HASH 1447832137
                                         // "Forpro Group Pty Ltd"
-// #define TRIAL_END_DATE 2016,6,15
+// #define TRIAL_END_DATE 2016,7,12
 // #define OWNER_HASH 1807536020
                                         // "Vantage Global Prime Pty Ltd"
 // #define TRIAL_END_DATE 2016,3,3
