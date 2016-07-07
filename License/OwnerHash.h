@@ -43,6 +43,9 @@
                                         // "Golden Bullion (Hong Kong) Company Limited"
 // #define TRIAL_END_DATE 0,0,0
 // #define OWNER_HASH 1532620363
+                                        // "Golden Bullion (Hong Kong) Company Ltd."
+// #define TRIAL_END_DATE 0,0,0
+// #define OWNER_HASH 2622491405
                                         // "Evolution iTrade Finance Group Limited"
 // #define TRIAL_END_DATE 0,0,0
 // #define OWNER_HASH 1027648337
