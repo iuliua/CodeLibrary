@@ -42,7 +42,7 @@ public:
             ConCommon info = { 0 };
             api->CommonGet(&info);
             std::string owner(info.owner);
-            std::string name_only = owner.substr(0, owner.find_first_of('(') - 1);
+            std::string name_only = owner.substr(0, owner.find_last_of('(') - 1);
             if (Hash(name_only.c_str()) == owner_name_hash)
                 return true;
         }
