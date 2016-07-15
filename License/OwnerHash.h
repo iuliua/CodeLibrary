@@ -11,6 +11,9 @@
                                         // "VantageFX" 
 // #define TRIAL_END_DATE 2016,7,12
 // #define OWNER_HASH 405379118
+                                        //"Halifax Investment Services Ltd"
+// #define TRIAL_END_DATE 2016,8,1
+// #define OWNER_HASH 1665753564
 
 #endif
 
