@@ -42,4 +42,62 @@ namespace Tools
         auto wsback = std::find_if_not(s.rbegin(), s.rend(), [](int c){return std::isspace(c); }).base();
         return (wsback <= wsfront ? std::string() : std::string(wsfront, wsback));
     }
+    void split(const std::string &s, char delim, std::vector<std::string> &elems)
+    {
+        std::stringstream ss(s);
+        std::string item;
+        while (std::getline(ss, item, delim))
+            elems.push_back(item);
+    }
+    bool iequals(const std::string& a, const std::string& b)
+    {
+        unsigned int sz = a.size();
+        if (b.size() != sz)
+            return false;
+        for (unsigned int i = 0; i < sz; ++i)
+            if (tolower(a[i]) != tolower(b[i]))
+                return false;
+        return true;
+    }
+};
+class ILineHandler
+{
+public:
+    virtual void Init() = 0;
+    virtual void Handle(const std::string&) = 0;
+    operator ILineHandler*()
+    {
+        return this;
+    }
+};
+class CTextFileProcessor
+{
+    std::string m_file_name;
+public:
+    CTextFileProcessor(const std::string &file_name)
+        :m_file_name(file_name)
+    {
+
+    }
+    CTextFileProcessor(const std::wstring &file_name)
+        :m_file_name(Tools::WStringToString(file_name))
+    {
+
+    }
+    BOOL Process(ILineHandler* handler)
+    {
+        std::ifstream fs(m_file_name);
+        if (!fs)
+            return FALSE;
+        std::string line;
+        while (TRUE)
+        {
+            line.clear();
+            std::getline(fs, line);
+            if (line.empty())
+                break;
+            handler->Handle(line);
+        };
+        return TRUE;
+    }
 };
