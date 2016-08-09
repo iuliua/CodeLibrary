@@ -4,6 +4,14 @@
 #include <iostream>
 #include <sstream>
 namespace Tools{
+    /*
+       patterns supported:
+          - exact match: "pattern"
+          - wildcard match: "patt*" - '*' acceptable only at the end and beggining of pattern string
+                    *df*df* not supported
+                    *df*    supported
+          - negative match: "!patt", "!patt*" - same rule applies for '*'
+    */
 class CMatching
 {
 private:
@@ -18,13 +26,27 @@ private:
 
     bool MatchWild(const std::string &pattern, const std::string &input)
     {
-        if (pattern.size() > 0)
+        if (pattern.size() == 0)
+            return false;
+        if (pattern.size() == 1 && pattern[0]=='*')
+            return true;
         if (pattern[pattern.size() - 1] == '*')
         {
-            if (pattern.size() == 1)
-                return true;
             std::string pattern_path = pattern.substr(0, pattern.length() - 1);
             if (input.find(pattern_path) == 0)
+                return true;
+        }
+        if (pattern[0] == '*')
+        {
+            std::string pattern_path = pattern.substr(1);
+            size_t index=input.find(pattern_path);
+            if (index != -1 &&  index==(input.length()-pattern_path.length()))
+                return true;
+        }
+        if (pattern[0] == '*' && pattern[pattern.size() - 1] == '*')
+        {
+            std::string pattern_path = pattern.substr(1,pattern.length()-2);
+            if (input.find(pattern_path) != -1)
                 return true;
         }
         return false;
