@@ -55,3 +55,31 @@ public:
         return get();
     }
 };
+
+template <class T>
+class CSyncedQueue
+{
+    std::queue<T> m_queue;
+    CSync::CriticalSection m_cs;
+public:
+    void Push(T& val)
+    {
+        CSync sync(m_cs);
+        m_queue.push(val);
+    }
+    size_t Size()
+    {
+        CSync sync(m_cs);
+        return m_queue.size();
+    }
+    T& Front()
+    {
+        CSync sync(m_cs);
+        return m_queue.front();
+    }
+    void Pop()
+    {
+        CSync sync(m_cs);
+        m_queue.pop();
+    }
+};
