@@ -3,7 +3,6 @@
 CMessageLoop::CMessageLoop(IMessageCustom* custom) :m_thread_id(0), 
                               m_thread_handle(INVALID_HANDLE_VALUE), 
 							  m_event_thread_create(INVALID_HANDLE_VALUE),
-                              m_exiting(0),
                               m_custom(custom)
 {
     m_event_thread_create = CreateEvent(NULL, TRUE, FALSE, NULL);
@@ -59,7 +58,7 @@ DWORD CMessageLoop::ThreadProc()
 		default:
             {
                 for (auto &consumer : m_processors)
-                    if (!consumer->ProcessMessage(msg.message, (LPVOID)msg.wParam, get_exiting()))
+                    if (!consumer->ProcessMessage(msg.message, (LPVOID)msg.wParam, m_exiting))
                         break;
                 if (m_custom)
                     m_custom->clear_msg(msg.message, (LPVOID)msg.wParam, msg.lParam);
@@ -80,3 +79,4 @@ BOOL CMessageLoop::msg(UINT msg, LPVOID wparam, LPARAM lparam)
 	}
 	return FALSE;
 }
+

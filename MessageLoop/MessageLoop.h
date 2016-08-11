@@ -3,6 +3,7 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <common\MT4\Sync.h>
 class IMessageProcessor
 {
 public:
@@ -38,25 +39,32 @@ public:
 private:
 	DWORD m_thread_id;
     IMessageCustom* m_custom;
-    volatile long m_exiting;
+    CSyncedFlag m_exiting;
 	HANDLE m_thread_handle;
 	HANDLE m_event_thread_create;
     std::vector<IMessageProcessor*> m_processors;
 	static DWORD WINAPI ThreadProcWrapper(LPVOID);
 	DWORD ThreadProc();
-    inline BOOL get_exiting() { return InterlockedAdd(&m_exiting, 0); }
 
 public:
     CMessageLoop(IMessageCustom* custom);
     ~CMessageLoop();
-    void set_exiting() { InterlockedExchange(&m_exiting, 1);}
-    void reset_exiting() { InterlockedExchange(&m_exiting, 0); }
 	void Stop();
 	void WaitToFinish();
 	virtual BOOL msg(UINT msg, LPVOID wparam = 0, LPARAM lparam = 0) override;
     virtual void add_processor(IMessageProcessor* proc) override
     {
         m_processors.push_back(proc);
+    }
+
+    virtual void set_exiting() override
+    {
+        m_exiting.set();
+    }
+
+    virtual void reset_exiting() override
+    {
+        m_exiting.reset();
     }
 };
 
