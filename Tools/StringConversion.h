@@ -2,6 +2,8 @@
 #include <string>
 #include <algorithm>
 #include <cctype>
+#include <fstream>
+#include <sstream>
 namespace Tools
 {
     static const std::wstring StringToWString(const std::string& s)
@@ -51,7 +53,7 @@ namespace Tools
     }
     bool iequals(const std::string& a, const std::string& b)
     {
-        unsigned int sz = a.size();
+        size_t sz = a.size();
         if (b.size() != sz)
             return false;
         for (unsigned int i = 0; i < sz; ++i)

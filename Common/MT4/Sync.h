@@ -1,27 +1,57 @@
 #pragma once
 
-class Sync
+class CSync
 {
-private:
-	CRITICAL_SECTION m_CS;
-
 public:
-	Sync()
-	{
-		ZeroMemory(&m_CS, sizeof(m_CS));
-		InitializeCriticalSection(&m_CS);
-	}
-	~Sync()
-	{
-		DeleteCriticalSection(&m_CS);
-		ZeroMemory(&m_CS, sizeof(m_CS));
-	}
-	inline void Lock()
-	{
-		EnterCriticalSection(&m_CS);
-	}
-	inline void Unlock()
-	{
-		LeaveCriticalSection(&m_CS);
-	}
+    class CriticalSection
+    {
+        CRITICAL_SECTION m_cs;
+    public:
+        CriticalSection()
+        {
+            InitializeCriticalSection(&m_cs);
+        }
+        ~CriticalSection()
+        {
+            DeleteCriticalSection(&m_cs);
+        }
+        operator CRITICAL_SECTION&() { return m_cs; }
+    };
+    CRITICAL_SECTION &m_cs;
+public:
+    CSync(CRITICAL_SECTION &cs)
+        :m_cs(cs)
+    {
+        EnterCriticalSection(&m_cs);
+    }
+    ~CSync()
+    {
+        LeaveCriticalSection(&m_cs);
+    }
+};
+
+class CSyncedFlag
+{
+    volatile long m_flag;
+public:
+    CSyncedFlag() :m_flag(0)
+    {
+
+    }
+    inline void set()
+    {
+        InterlockedExchange(&m_flag, 1);
+    }
+    inline void reset()
+    {
+        InterlockedExchange(&m_flag, 0);
+    }
+    inline BOOL get()
+    {
+        return InterlockedAdd(&m_flag, 0);
+    }
+    inline operator BOOL()
+    {
+        return get();
+    }
 };
