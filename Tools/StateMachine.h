@@ -15,16 +15,14 @@ namespace Tools
         virtual void doAction(int id) = 0;
         void event(int event)
         {
-            m_sync.Lock();
+            CSync lock(m_cs);
             qDataQueue.push(event);
-            m_sync.Unlock();
             
         }
         bool event_available()
         {
-            m_sync.Lock();
+            CSync lock(m_cs);
             UINT size=qDataQueue.size();
-            m_sync.Unlock();
             return size > 0;
         }
         ~CStateMachine()
@@ -33,7 +31,7 @@ namespace Tools
         }
     private:
         std::queue<int> qDataQueue;
-        CriticalSection m_sync;
+        CSync::CriticalSection m_cs;
         HANDLE hThread;
     protected:
 
@@ -46,12 +44,16 @@ namespace Tools
         {
             while (true)
             { 
-                m_sync.Lock();
-                if (qDataQueue.size())
+                size_t queue_size=0;
+                int event = 0;
                 {
-                    int event = qDataQueue.front();
+                    CSync sync(m_cs);
+                    queue_size = qDataQueue.size();
+                    event = qDataQueue.front();
                     qDataQueue.pop();
-                    m_sync.Unlock();
+                }
+                if (queue_size>0)
+                {
                     for (auto &transition : m_transitions)
                     {
                         if (transition.current != m_current_state || transition.event != event)
@@ -62,10 +64,7 @@ namespace Tools
                     }
                 }
                 else
-                {
-                    m_sync.Unlock(); 
                     Sleep(100);
-                }
             }
         }
         struct Transition
