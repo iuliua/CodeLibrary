@@ -58,5 +58,8 @@
                                         // "TransMarket Group Ltd"
 // #define TRIAL_END_DATE 0,0,0
 // #define OWNER_HASH 1625696139
+                                        // "Redbull Prime Limited"
+// #define TRIAL_END_DATE 2016,8,26
+// #define OWNER_HASH 2641520517
 
 #endif
