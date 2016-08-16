@@ -1,4 +1,5 @@
 #pragma once
+#include <queue>
 
 class CSync
 {
@@ -81,5 +82,55 @@ public:
     {
         CSync sync(m_cs);
         m_queue.pop();
+    }
+};
+
+class CThreadObject
+{
+public:
+    class IAction
+    {
+    public:
+        virtual BOOL Action() = 0;
+        operator IAction*() { return this; }
+    };
+private:
+    HANDLE m_thread;
+    CSyncedFlag m_exiting;
+    DWORD m_sleep_time;
+    IAction *m_action;
+public:
+    CThreadObject(DWORD SleepTime, IAction *action)
+        :m_action(action),
+        m_sleep_time(SleepTime)
+    {
+    }
+    BOOL Init()
+    {
+        if (m_action == nullptr)
+            return FALSE;
+        m_thread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)ThreadProcRequestsWrapper, this, 0, NULL);
+        return (m_thread == INVALID_HANDLE_VALUE);
+    }
+    ~CThreadObject()
+    {
+        m_exiting.set();
+        WaitForSingleObject(m_thread, 30000);
+    }
+    static DWORD ThreadProcRequestsWrapper(LPVOID data)
+    {
+        return static_cast<CThreadObject*>(data)->ThreadProc();
+    }
+    DWORD ThreadProc()
+    {
+        while (!m_exiting)
+        {
+            if (m_action == nullptr)
+                return 0;
+            else
+                if (!m_action->Action())
+                    Sleep(m_sleep_time);
+        }
+        return 0;
     }
 };
