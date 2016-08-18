@@ -85,51 +85,59 @@ public:
     }
 };
 
-class CThreadObject
+class CThreadX567
 {
 public:
-    class IAction
+    class IThreadLoopAction
     {
     public:
         virtual BOOL Action() = 0;
-        operator IAction*() { return this; }
+        operator IThreadLoopAction*() { return this; }
     };
+
 private:
-    HANDLE m_thread;
+    HANDLE m_hThread;
     CSyncedFlag m_exiting;
-    DWORD m_sleep_time;
-    IAction *m_action;
+    IThreadLoopAction *m_action;
+    int m_sleep_time;
 public:
-    CThreadObject(DWORD SleepTime, IAction *action)
+    CThreadX567(IThreadLoopAction* action, int sleep_time=10)
         :m_action(action),
-        m_sleep_time(SleepTime)
-    {
-    }
-    BOOL Init()
+        m_sleep_time(sleep_time)
     {
         if (m_action == nullptr)
-            return FALSE;
-        m_thread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)ThreadProcRequestsWrapper, this, 0, NULL);
-        return (m_thread == INVALID_HANDLE_VALUE);
+            return;
+        m_hThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)ThreadProcWrapper, this, CREATE_SUSPENDED, NULL);
     }
-    ~CThreadObject()
+    BOOL Start()
+    {
+        if (m_hThread == INVALID_HANDLE_VALUE)
+            return FALSE;
+        if (ResumeThread(m_hThread) == (DWORD)-1)
+            return FALSE;
+        else
+            return TRUE;
+    }
+    void Stop()
     {
         m_exiting.set();
-        WaitForSingleObject(m_thread, 30000);
+        WaitForSingleObject(m_hThread, 10000);
     }
-    static DWORD ThreadProcRequestsWrapper(LPVOID data)
+    ~CThreadX567()
     {
-        return static_cast<CThreadObject*>(data)->ThreadProc();
+        Stop();
+    }
+private:
+    static DWORD WINAPI ThreadProcWrapper(LPVOID arg)
+    {
+        return ((CThreadX567*)arg)->ThreadProc();
     }
     DWORD ThreadProc()
     {
         while (!m_exiting)
         {
-            if (m_action == nullptr)
-                return 0;
-            else
-                if (!m_action->Action())
-                    Sleep(m_sleep_time);
+            if (!m_action->Action())
+                Sleep(m_sleep_time);
         }
         return 0;
     }
