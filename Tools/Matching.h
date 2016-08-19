@@ -5,12 +5,14 @@
 #include <sstream>
 namespace Tools{
     /*
-       patterns supported:
-          - exact match: "pattern"
-          - wildcard match: "patt*" - '*' acceptable only at the end and beggining of pattern string
-                    *df*df* not supported
-                    *df*    supported
-          - negative match: "!patt", "!patt*" - same rule applies for '*'
+       Supported wildcard:
+          - exact match      EURUSD will match EURUSD
+          - wildcard match   EUR*   will match EURUSD,EURAUD,etc
+                             *USD   will match EURUSD,JPYUSD, etc
+                             *US*   will match EURUSD
+                                    will NOT match USDJPY
+                             *AB*C* NOT SUPPORTED
+          - negative match  !*EUR*  will match everything that doesn't contain EUR
     */
 class CMatching
 {

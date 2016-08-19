@@ -61,5 +61,8 @@
                                         // "Redbull Prime Limited"
 // #define TRIAL_END_DATE 2016,8,26
 // #define OWNER_HASH 2641520517
+                                        // "PT. Agrodana Futures"
+ #define TRIAL_END_DATE 2016,9,2
+ #define OWNER_HASH 1578672039
 
 #endif
