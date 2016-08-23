@@ -87,3 +87,25 @@ int decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key, u
 
     return plaintext_len;
 }
+class CLicenseFile
+{
+public:
+    static std::string GetLicenseString(const std::string &file_name)
+    {
+        char output[1024];
+        output[0] = 0;
+        HANDLE hFile = CreateFileA(file_name.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+        if (hFile != INVALID_HANDLE_VALUE)
+        {
+            char buffer[1024];
+            DWORD size = 0;
+            if (ReadFile(hFile, buffer, 1024, &size, 0))
+            {
+                int outputlen = decrypt((UCHAR*)buffer, size, key, iv, (UCHAR*)output);
+                output[outputlen] = 0;
+            }
+            CloseHandle(hFile);
+        }
+        return output;
+    }
+};
