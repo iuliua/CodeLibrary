@@ -90,9 +90,16 @@ int decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key, u
 class CLicenseFile
 {
 public:
-    static BOOL GetLicenseString(const std::string &file_name,std::string &license_string)
+    class ILicenseValidation
     {
-        BOOL ret = FALSE;
+    public:
+        virtual BOOL ValidLicense(const std::string &license_string) = 0;
+        operator ILicenseValidation*() { return this; }
+    };
+    
+    static BOOL IsLicenseValid(const std::string &file_name, CLicenseFile::ILicenseValidation *license_validator)
+    {
+        int ret = FALSE;
         HANDLE hFile = CreateFileA(file_name.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
         if (hFile != INVALID_HANDLE_VALUE)
         {
@@ -105,8 +112,9 @@ public:
                 decrypt(buffer, 32, key, iv, random_seed);
                 int outsize = decrypt(buffer + 32, size - 32, key, random_seed, output);
                 output[outsize] = 0;
+                std::string license_string;
                 license_string.assign((char*)output);
-                ret = TRUE;
+                ret = license_validator->ValidLicense(license_string);
             }
             CloseHandle(hFile);
         }
