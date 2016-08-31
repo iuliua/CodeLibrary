@@ -1,5 +1,6 @@
 #pragma once
 #include <openssl/evp.h>
+#include "Tools\CTrialPeriod.h"
 
 unsigned char key[] = { 0x6a, 0x46, 0x68, 0x36, 0x69, 0x6e, 0x67, 0x33,
     0x39, 0x39, 0x4d, 0x4e, 0x37, 0x68, 0x6b, 0x4e,
@@ -121,6 +122,30 @@ public:
                 std::string license_string;
                 license_string.assign((char*)output);
                 ret = ValidLicense(license_string,arg_plugin_name,mt_version,mt_company_name);
+            }
+            CloseHandle(hFile);
+        }
+        return ret;
+    }
+    //TFEX and SET gateways
+    static BOOL GetLicenseString(const std::string file_name, std::string &license_string)
+    {
+        int ret = FALSE;
+        HANDLE hFile = CreateFileA(file_name.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+        if (hFile != INVALID_HANDLE_VALUE)
+        {
+            UCHAR buffer[1024];
+            DWORD size = 0;
+            if (ReadFile(hFile, buffer, 1024, &size, 0))
+            {
+                UCHAR output[1024];
+                unsigned char random_seed[32];
+                decrypt(buffer, 32, key, iv, random_seed);
+                int outsize = decrypt(buffer + 32, size - 32, key, random_seed, output);
+                output[outsize] = 0;
+                std::string license_string;
+                license_string.assign((char*)output);
+                ret = TRUE;
             }
             CloseHandle(hFile);
         }
