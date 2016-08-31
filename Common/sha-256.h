@@ -90,17 +90,23 @@ int decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key, u
 class CLicenseFile
 {
 public:
-    class ILicenseValidation
-    {
-    public:
-        virtual BOOL ValidLicense(const std::string &license_string) = 0;
-        operator ILicenseValidation*() { return this; }
-    };
     
-    static BOOL IsLicenseValid(const std::string &file_name, CLicenseFile::ILicenseValidation *license_validator)
+    static BOOL IsLicenseValid(const std::string arg_plugin_name, const std::string &mt_version, const std::string &mt_company_name)
     {
+        char path[MAX_PATH];
+        HMODULE hm = NULL;
+
+        if (!GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
+            GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+            (LPCSTR)&IsLicenseValid,
+            &hm))
+            return FALSE;
+        GetModuleFileNameA(hm, path, sizeof(path));
+
+        std::string full_path_license_file(path);
+        full_path_license_file=full_path_license_file.substr(0, full_path_license_file.size() - 3) + "lic";
         int ret = FALSE;
-        HANDLE hFile = CreateFileA(file_name.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+        HANDLE hFile = CreateFileA(full_path_license_file.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
         if (hFile != INVALID_HANDLE_VALUE)
         {
             UCHAR buffer[1024];
@@ -114,10 +120,34 @@ public:
                 output[outsize] = 0;
                 std::string license_string;
                 license_string.assign((char*)output);
-                ret = license_validator->ValidLicense(license_string);
+                ret = ValidLicense(license_string,arg_plugin_name,mt_version,mt_company_name);
             }
             CloseHandle(hFile);
         }
         return ret;
+    }
+    static BOOL ValidLicense(const std::string &license_string, const std::string arg_plugin_name, const std::string &mt_version, const std::string &mt_company_name) 
+    {
+        //Only for test;2016-06-2
+        std::istringstream iss(license_string);
+        std::string version;
+        std::string plugin_name;
+        std::string expiry_date;
+        std::string company_name;
+
+        std::getline(iss, version, ';');
+        if (version != mt_version)
+            return FALSE;
+        std::getline(iss, plugin_name, ';');
+        std::getline(iss, company_name, ';');
+        std::getline(iss, expiry_date, ';');
+        if (plugin_name != arg_plugin_name)
+            return FALSE;
+        if (mt_company_name != company_name)
+            return FALSE;
+
+        if (CTrialPeriod::Expired(expiry_date))
+            return FALSE;
+        return TRUE;
     }
 };
