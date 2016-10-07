@@ -94,23 +94,17 @@ namespace Tools
     }
     class CMeasureTime
     {
-        LARGE_INTEGER start1, finish, freq;
-        double last_meas;
+        LARGE_INTEGER m_start, finish, freq;
     public:
         CMeasureTime() { QueryPerformanceFrequency(&freq); }
         void start()
         {
-            QueryPerformanceCounter(&start1);
+            QueryPerformanceCounter(&m_start);
         }
-        void stop()
+        double stop()
         {
             QueryPerformanceCounter(&finish);
-            last_meas = (finish.QuadPart - start1.QuadPart) / (double)freq.QuadPart;
+            return (finish.QuadPart - m_start.QuadPart) / (double)freq.QuadPart;
         }
-        inline double get()
-        {
-            return last_meas;
-        }
-
     };
 }
