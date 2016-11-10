@@ -45,14 +45,14 @@ namespace Tools
         auto wsback = std::find_if_not(s.rbegin(), s.rend(), [](int c){return std::isspace(c); }).base();
         return (wsback <= wsfront ? std::string() : std::string(wsfront, wsback));
     }
-    void split(const std::string &s, char delim, std::vector<std::string> &elems)
+    static void split(const std::string &s, char delim, std::vector<std::string> &elems)
     {
         std::stringstream ss(s);
         std::string item;
         while (std::getline(ss, item, delim))
             elems.push_back(item);
     }
-    bool iequals(const std::string& a, const std::string& b)
+    static bool iequals(const std::string& a, const std::string& b)
     {
         size_t sz = a.size();
         if (b.size() != sz)

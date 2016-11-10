@@ -31,33 +31,20 @@ namespace Tools
     static UINT GetNumberOfDigits(double number)
     {
         char buf[32];
-        char* pointer = buf;
-        UINT digits = 0;
-        bool start_counting = false;
         sprintf_s(buf, 32, "%f", number);
+        int index = strlen(buf) - 1 - 2;
+        char *pointer = buf + index;
         while (*pointer)
         {
-            if (*pointer == '.')
+            if (*pointer == '0')
             {
-                start_counting = true;
-                pointer++;
-                continue;
-            }
-            if (*pointer == '0' && start_counting == false)
-            {
-                pointer++;
-                continue;
-            }
-            if (*pointer != '0')
-            {
-                if (start_counting)
-                    digits++;
-                pointer++;
+                index--;
+                pointer--;
             }
             else
-                return digits;
+                break;
         }
-        return 0;
+        return index - 1;
     }
     static std::string ToString(int number)
     {
