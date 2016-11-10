@@ -41,10 +41,14 @@ namespace Tools
             {
                 start_counting = true;
                 pointer++;
-                digits++;
                 continue;
             }
-            if (*pointer == '0')
+            if (*pointer == '0' && start_counting == false)
+            {
+                pointer++;
+                continue;
+            }
+            if (*pointer != '0')
             {
                 if (start_counting)
                     digits++;
