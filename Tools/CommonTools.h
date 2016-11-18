@@ -32,7 +32,7 @@ namespace Tools
     {
         char buf[32];
         sprintf_s(buf, 32, "%f", number);
-        int index = strlen(buf) - 1 - 2;
+        UINT index = (UINT)strlen(buf) - 1 - 2;
         char *pointer = buf + index;
         while (*pointer)
         {
