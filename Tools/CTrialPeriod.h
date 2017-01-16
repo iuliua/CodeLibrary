@@ -16,7 +16,7 @@ public:
     //format expected is YYYY-MM-DD
     inline static bool Expired(const std::string &date)
     {
-        if (date.empty())
+        if (date.empty() || date=="FULL")
             return FALSE;
         std::istringstream iss(date);
         std::string year, month, day;
