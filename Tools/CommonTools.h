@@ -98,4 +98,23 @@ namespace Tools
             return (finish.QuadPart - m_start.QuadPart) / (double)freq.QuadPart;
         }
     };
+    static UINT Hash(LPCWSTR str)
+    {
+        unsigned hash = 2197520818;
+        if (str)
+        {
+            while (*str)
+            {
+                hash = hash * 101 + *str++;
+            }
+        }
+        return hash;
+    }
+    static UINT Hash(LPCSTR str)
+    {
+        wchar_t dst[128];
+        if (!::MultiByteToWideChar(CP_ACP, 0, str, -1, dst, _countof(dst)))
+            dst[0] = 0;
+        return Hash(dst);
+    }
 }
