@@ -92,6 +92,7 @@ namespace Tools
         {
             QueryPerformanceCounter(&m_start);
         }
+        //returns number of seconds
         double stop()
         {
             QueryPerformanceCounter(&finish);
