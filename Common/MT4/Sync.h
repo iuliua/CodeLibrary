@@ -1,5 +1,7 @@
 #pragma once
 #include <queue>
+#include <thread>
+#include <atomic>
 
 class CSync
 {
@@ -31,32 +33,6 @@ public:
     }
 };
 
-class CSyncedFlag
-{
-    volatile long m_flag;
-public:
-    CSyncedFlag() :m_flag(0)
-    {
-
-    }
-    inline void set()
-    {
-        InterlockedExchange(&m_flag, 1);
-    }
-    inline void reset()
-    {
-        InterlockedExchange(&m_flag, 0);
-    }
-    inline BOOL get()
-    {
-        return InterlockedAdd(&m_flag, 0);
-    }
-    inline operator BOOL()
-    {
-        return get();
-    }
-};
-
 template <class T>
 class CSyncedQueue
 {
@@ -85,60 +61,56 @@ public:
     }
 };
 
-class CThreadX567
+class CThreadLoopAction
 {
 public:
     class IThreadLoopAction
     {
     public:
-        virtual BOOL Action() = 0;
+        virtual void Action() = 0;
         operator IThreadLoopAction*() { return this; }
     };
 
 private:
-    HANDLE m_hThread;
-    CSyncedFlag m_exiting;
+    std::thread m_thread;
+    std::atomic<bool> m_stop;
+    std::atomic<bool> m_start;
     IThreadLoopAction *m_action;
-    int m_sleep_time;
+
 public:
-    CThreadX567(IThreadLoopAction* action, int sleep_time=10)
-        :m_action(action),
-        m_sleep_time(sleep_time)
+    CThreadLoopAction(IThreadLoopAction* action, int sleep_time=10)
+        : m_action(action)
     {
-        if (m_action == nullptr)
-            return;
-        m_hThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)ThreadProcWrapper, this, CREATE_SUSPENDED, NULL);
+        if (action!=nullptr)
+            m_thread=std::thread(ThreadProcWrapper, this,sleep_time);
     }
-    BOOL Start()
+    void Start()
     {
-        if (m_hThread == INVALID_HANDLE_VALUE)
-            return FALSE;
-        if (ResumeThread(m_hThread) == (DWORD)-1)
-            return FALSE;
-        else
-            return TRUE;
+        m_start = true;
     }
     void Stop()
     {
-        m_exiting.set();
-        WaitForSingleObject(m_hThread, 10000);
+        m_stop = true;
+        if (m_thread.joinable())
+            m_thread.join();
     }
-    ~CThreadX567()
+    ~CThreadLoopAction()
     {
         Stop();
     }
 private:
-    static DWORD WINAPI ThreadProcWrapper(LPVOID arg)
+    static void ThreadProcWrapper(CThreadLoopAction* arg,int sleep_time)
     {
-        return ((CThreadX567*)arg)->ThreadProc();
+        arg->ThreadProc(sleep_time);
     }
-    DWORD ThreadProc()
+    void ThreadProc(int sleep_time)
     {
-        while (!m_exiting)
+        do std::this_thread::sleep_for(std::chrono::milliseconds(10)); while (!m_start);
+        do
         {
-            if (!m_action->Action())
-                Sleep(m_sleep_time);
-        }
-        return 0;
+            m_action->Action();
+            std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time));
+        } 
+        while (!m_stop);
     }
 };

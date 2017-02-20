@@ -39,7 +39,7 @@ public:
 private:
 	DWORD m_thread_id;
     IMessageCustom* m_custom;
-    CSyncedFlag m_exiting;
+    std::atomic<bool> m_exiting;
 	HANDLE m_thread_handle;
 	HANDLE m_event_thread_create;
     std::vector<IMessageProcessor*> m_processors;
@@ -59,12 +59,12 @@ public:
 
     virtual void set_exiting() override
     {
-        m_exiting.set();
+        m_exiting = true;
     }
 
     virtual void reset_exiting() override
     {
-        m_exiting.reset();
+        m_exiting = false;
     }
 };
 
